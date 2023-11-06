@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style\studentStyle.css">
+    <title>Student Page</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, Student!</h1>
+
+
+        <form id="image-upload-form" style="display: none;">
+            <label for="studentImages">Upload Your Image:</label><br>
+            <input type="file" id="studentImages" name="studentImages" accept="image/*" multiple>
+            <input type="submit" value="Upload Image">
+        </form>
+
+
+        <div id="student-image-section" style="display: none;">
+            <h2>Your Image:</h2>
+            <img id="studentImage" src="" alt="Your image">
+        </div>
+
+
+        <button id="take-attendance-button">Take Attendance</button>
+    </div>
+
+    <script src="script\student.js"></script> 
+
+</body>
+</html>
+
+

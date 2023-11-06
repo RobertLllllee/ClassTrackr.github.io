@@ -1,0 +1,70 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #F3F8F2;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    width: 450px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 10px;
+    background-color: #EBE9E9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+form {
+    text-align: center;
+}
+
+label {
+    font-weight: bold;
+    color: #3581B8;
+    font-size: 17px;
+}
+
+select,
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    margin-top: 5px; /* Added margin-top for even spacing */
+    border: 1px solid #DEE2D6;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+select {
+    background-color: #F3F8F2;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #FCB07E;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #3581B8;
+}
+
+#message {
+    font-weight: bold;
+    color: #FCB07E;
+    font-size: 18px;
+}
+
+/* Style for the "Upload Images" form */
+#image-upload-form {
+    display: none;
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="style\styles.css">
+    <title>Login</title>
+</head>
+<body>
+    <div class="container">
+    <form id="login-form">
+        <label for="UserType">User Type:</label><br>
+        <select id="UserType" name="UserType" onchange="changeFields()">
+            <option value="Administrator">Administrator</option>
+            <option value="Student">Student</option>
+            <option value="Instructor">Instructor</option>
+        </select><br>
+
+        <div id="adminFields">
+            <label for="AdminID">Admin ID:</label><br>
+            <input type="text" id="AdminID" name="AdminID"><br>
+            <label for="AdminPass">Password:</label><br>
+            <input type="password" id="AdminPass" name="AdminPass"><br>
+        </div>
+
+        <div id="studentFields" style="display: none;">
+            <label for="StudentID">Student ID:</label><br>
+            <input type="text" id="StudentID" name="StudentID"><br>
+            <label for="StudentPass">Password:</label><br>
+            <input type="password" id="StudentPass" name="StudentPass"><br>
+        </div>
+
+        <div id="instructorFields" style="display: none;">
+            <label for="InstructorID">Instructor ID:</label><br>
+            <input type="text" id="InstructorID" name="InstructorID"><br>
+            <label for="InstructorPass">Password:</label><br>
+            <input type="password" id="InstructorPass" name="InstructorPass"><br>
+        </div>
+
+        <input type="submit" value="Login">
+    </form>
+
+    <!-- This form will be shown only after successful login -->
+    <form id="image-upload-form" style="display: none;">
+        <label for="studentImages">Upload Student Images:</label><br>
+        <input type="file" id="studentImages" name="studentImages" accept="image/*" multiple><br>
+        <input type="submit" value="Upload Images">
+    </form>
+</div>
+
+<script src="script/index.js"></script>
+
+<script>
+   function changeFields() {
+            const userType = document.getElementById('UserType').value;
+            
+            document.getElementById('adminFields').style.display = 'none';
+            document.getElementById('studentFields').style.display = 'none';
+            document.getElementById('instructorFields').style.display = 'none';
+            
+            switch(userType) {
+                case 'Administrator':
+                    document.getElementById('adminFields').style.display = 'block';
+                    break;
+                case 'Student':
+                    document.getElementById('studentFields').style.display = 'block';
+                    break;
+                case 'Instructor':
+                    document.getElementById('instructorFields').style.display = 'block';
+                    break;
+            }
+        }
+</script>
+
+</body>
+</html>
