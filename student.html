@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style\studentStyle.css">
     <title>Student Page</title>
+    <link rel="stylesheet" type="text/css" href="style\studentStyle.css">
 </head>
 <body>
+    
     <div class="container">
         <h1>Welcome, Student!</h1>
-
+        <div id="userInfo">
+            <p>User Type: <span id="userType"></span></p>
+            <p>User ID: <span id="userID"></span></p>
+            <p>User Name: <span id="userName"></span></p>
+        </div>
 
         <form id="image-upload-form" style="display: none;">
             <label for="studentImages">Upload Your Image:</label><br>
