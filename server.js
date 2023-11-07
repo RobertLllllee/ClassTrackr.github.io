@@ -9,6 +9,7 @@ const { MongoClient, GridFSBucket } = require('mongodb');
 const fs = require('fs');
 const MongoStore = require('connect-mongo');
 const mongoose = require('mongoose');
+const jimp = require('jimp');
 
 const uri = "mongodb+srv://hongleejun:nQBHTHJQCBsPrCpQ@cluster0.laejwaw.mongodb.net/Entities";
 const client = new MongoClient(uri);
