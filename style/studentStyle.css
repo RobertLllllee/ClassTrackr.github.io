@@ -1,5 +1,18 @@
 body {
     font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+.dashboard {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    background-color: #fff;
+    margin-top: 20px;
 }
 
 .container {
@@ -13,6 +26,15 @@ h1 {
     color: #333;
 }
 
+p {
+    margin: 0;
+    font-size: 18px;
+}
+
+span {
+    font-weight: bold;
+    color: #007BFF;
+}
 form {
     margin-bottom: 20px;
 }
@@ -34,4 +56,11 @@ input[type="submit"] {
 #studentImage {
     max-width: 100%;
     height: auto;
+}
+#studentInfo {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
