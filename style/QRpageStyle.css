@@ -1,0 +1,59 @@
+   body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        padding: 0;
+        background-color: #f4f4f4;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    form {
+        max-width: 400px;
+        margin: 0 auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input[type="date"],
+    select,
+    input[type="text"],
+    button {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    #qrcode {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    #expiry-message {
+        text-align: center;
+        color: #ff0000;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+

@@ -16,4 +16,8 @@ window.onload = function() {
       }
     }
   };
-  
+      // JavaScript function to redirect to QR.html
+      function redirectToQRPage() {
+        // Change window.location to the path of your QR.html file
+        window.location.href = 'QR.html';
+    }

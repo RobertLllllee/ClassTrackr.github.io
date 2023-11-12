@@ -15,3 +15,4 @@ function displayUserDetails() {
       document.getElementById('userName').textContent = userName;
   }
 }
+

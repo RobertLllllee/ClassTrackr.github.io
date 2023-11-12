@@ -1,0 +1,67 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="css/style.css" />
+    <title>QR Code Generator with Dynamic Timeslot</title>
+</head>
+<body>
+    <h1>QR Code Generator with Dynamic Timeslot</h1>
+    <form id="qr-form">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br><br>
+
+        <label for="timeslot">Timeslot:</label>
+        <select id="timeslot" name="timeslot" required></select><br><br>
+
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required><br><br>
+
+        <button type="button" id="generate-button">Generate QR Code</button><br><br>
+
+        <div id="qrcode"></div>
+        <div id="expiry-message"></div>
+    </form>
+
+    <script src="js\qrcode.min.js"></script>
+    
+    <script src="js\script.js"></script>
+</body>
+</html> -->
+
+<!---------------------------------------------------------------------------------------------------------------------------->
+
+<!-- Only For testing-->
+<!DOCTYPE html>
+<html>
+    <link rel="stylesheet" href="style\QRpageStyle.css" />
+<head>
+    <title>QR Code Generator</title>
+</head>
+<body>
+    <h1>QR Code Generator</h1>
+    <form id="qr-form">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required><br><br>
+
+        <label for="timeslot">Timeslot:</label>
+        <select id="timeslot" name="timeslot" required></select><br><br>
+
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required><br><br>
+
+        <button type="button" id="generate-button">Generate QR Code</button><br><br>
+
+        <div id="qrcode-container">
+            <div id="qrcode"></div>
+            <div id="code"></div>
+            <div id="expiry-message"></div>
+            <div id="countdown"></div>
+        </div>
+    </form>
+
+    <script src="script\qrcode.min.js"></script>
+    <script src="script\QRgenerator.js"></script>
+</body>
+</html>
+
+
