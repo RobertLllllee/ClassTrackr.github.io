@@ -1,49 +1,85 @@
-window.onload = function() {
-  document.getElementById('login-form').addEventListener('submit', function(event) {
-    event.preventDefault();
+window.onload = function () {
+  document.getElementById('UserType').addEventListener('change', changeFields);
 
-    const UserType = document.getElementById('UserType').value;
-    let AdminID, AdminPass, StudentID, StudentPass, InstructorID, InstructorPass;
+  document.getElementById('login-form').addEventListener('submit', async function (event) {
+      event.preventDefault();
 
-    switch(UserType) {
-      case 'Administrator':
-        AdminID = document.getElementById('AdminID').value;
-        AdminPass = document.getElementById('AdminPass').value;
-        break;
-      case 'Student':
-        StudentID = document.getElementById('StudentID').value;
-        StudentPass = document.getElementById('StudentPass').value;
-        break;
-      case 'Instructor':
-        InstructorID = document.getElementById('InstructorID').value;
-        InstructorPass = document.getElementById('InstructorPass').value;
-        break;
-      // Add more cases as needed
-    }
+      const userType = document.getElementById('UserType').value;
+      const fieldNames = {
+          'Administrator': ['AdminID', 'AdminPass'],
+          'Student': ['StudentID', 'StudentPass'],
+          'Instructor': ['InstructorID', 'InstructorPass']
+      };
 
-    fetch('http://localhost:5500/login', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ AdminID, AdminPass, StudentID, StudentPass, InstructorID, InstructorPass, UserType }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-          // Display a success message
-          alert('Login successful');
-        // After successful login, set session storage items
-        sessionStorage.setItem('userType', UserType); // Set the user type
-        sessionStorage.setItem('userId', data.userId); // Set the user ID returned from the server
-        sessionStorage.setItem('userName', data.userName); // Set the user name returned from the server
-    
-        // Redirect to the appropriate page
-        window.location.href = data.redirect;
-      } else {
-        alert(data.message);
+      const [userIdField, userPassField] = fieldNames[userType];
+
+      try {
+          const response = await fetch('http://localhost:5500/login', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  UserType: userType,
+                  [userIdField]: document.getElementById(userIdField).value,
+                  [userPassField]: document.getElementById(userPassField).value,
+              }),
+            //   credentials: 'include',
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+              // Display a success message
+              alert('Login successful');
+
+              // After successful login, set session storage items
+              sessionStorage.setItem('userType', userType);
+              sessionStorage.setItem('userId', data.userId);
+              sessionStorage.setItem('userName', data.userName);
+              // Add other fields as needed
+
+              // Adjust the redirect URL based on user type
+              let redirectUrl;
+              switch (userType) {
+                  case 'Administrator':
+                      redirectUrl = 'admin.html';
+                      break;
+                  case 'Student':
+                      redirectUrl = 'student.html';
+                      break;
+                  case 'Instructor':
+                      redirectUrl = 'instructor.html';
+                      break;
+              }
+
+              // Redirect to the appropriate page
+              window.location.href = redirectUrl;
+          } else {
+              alert(data.message);
+          }
+      } catch (error) {
+          console.error('Error during login:', error);
+          alert('Login failed. Please try again.');
       }
-    });
   });
-}
+};
 
+function changeFields() {
+  const userType = document.getElementById('UserType').value;
+  document.getElementById('adminFields').style.display = 'none';
+  document.getElementById('studentFields').style.display = 'none';
+  document.getElementById('instructorFields').style.display = 'none';
+
+  switch (userType) {
+      case 'Administrator':
+          document.getElementById('adminFields').style.display = 'block';
+          break;
+      case 'Student':
+          document.getElementById('studentFields').style.display = 'block';
+          break;
+      case 'Instructor':
+          document.getElementById('instructorFields').style.display = 'block';
+          break;
+  }
+}

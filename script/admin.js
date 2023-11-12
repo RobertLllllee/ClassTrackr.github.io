@@ -1,18 +1,17 @@
 window.onload = function() {
-  // Fetch user information when the page loads
-  fetchUserInfo();
+  // Fetch and display user information
+  displayUserDetails();
+};
 
-  // Function to fetch and display the user information
-  function fetchUserInfo() {
-    const userType = sessionStorage.getItem('userType');
-    const userId = sessionStorage.getItem('userId'); // Retrieve the appropriate user ID
-    const userName = sessionStorage.getItem('userName'); // Retrieve the appropriate user name
+function displayUserDetails() {
+  const userType = sessionStorage.getItem('userType');
+  const userId = sessionStorage.getItem('userId');
+  const userName = sessionStorage.getItem('userName');
 
-    if (userType && userId) {
-      // Update the dashboard with UserType, UserID, and UserName
+  if (userType && userId && userName) {
+      // Display user information on the page
       document.getElementById('userType').textContent = userType;
       document.getElementById('userID').textContent = userId;
-      document.getElementById('userName').textContent = userName; // Display userName
-    }
+      document.getElementById('userName').textContent = userName;
   }
-};
+}

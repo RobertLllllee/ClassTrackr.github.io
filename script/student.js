@@ -1,96 +1,69 @@
-console.log("student.js loaded");
+window.onload = function() {
+    // Fetch and display user information
+    displayUserDetails();
 
-window.onload = function () {
-  fetchUserInfo();
+    // Handle image upload form submission
+    const imageUploadForm = document.getElementById('imageUploadForm');
+    imageUploadForm.addEventListener('submit', function(event) {
+        event.preventDefault();
 
-  // Function to fetch and display the user information
-  function fetchUserInfo() {
-    const userType = sessionStorage.getItem('userType');
-    const userId = sessionStorage.getItem('userId'); // Retrieve the appropriate user ID
-    const userName = sessionStorage.getItem('userName'); // Retrieve the appropriate user name
+        // Get the selected image file from the input field
+        const imageFile = document.getElementById('imageFile').files[0];
 
-    if (userType && userId) {
-      // Update the dashboard with UserType, UserID, and UserName
-      document.getElementById('userType').textContent = userType;
-      document.getElementById('userID').textContent = userId;
-      document.getElementById('userName').textContent = userName; // Display userName
-    }
-  };
+        // Check if an image file is selected
+        if (!imageFile) {
+            console.log('No image file selected');
+            alert('Please select an image file');
+            return;
+        }
 
-  const userType = sessionStorage.getItem("userType");
-  let userId = sessionStorage.getItem("userId");
+        console.log('Uploading image:', imageFile);
 
-  if (userType === "Student") {
-    // Check if the user has already uploaded images
-    checkIfImagesUploaded(userId).then((result) => {
-      if (result.uploaded) {
-        // Images already uploaded, hide the image upload form
-        document.getElementById("image-upload-form").style.display = "none";
-      } else {
-        // Images not uploaded, show the image upload form
-        document.getElementById("image-upload-form").style.display = "block";
+        // Use FormData to prepare the image for upload
+        const formData = new FormData();
+        formData.append('studentID', sessionStorage.getItem('userId'));
+        formData.append('image', imageFile);
 
-        // Handle image upload form submission
-        document
-          .getElementById("image-upload-form")
-          .addEventListener("submit", function (event) {
-            event.preventDefault();
-
-            // Ensure userId is set and not undefined
-            if (!userId) {
-              alert("User ID is missing. Please log in.");
-              return;
+        // Perform an AJAX request to upload the image
+        fetch('http://localhost:5500/uploadImage', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Server response:', data);
+            if (data && data.success) {
+                console.log('Image upload success:', data.message);
+                alert(data.message);
+            } else {
+                console.log('Image upload failed:', data.message);
+                alert('Image upload failed: ' + data.message);
             }
+        })
+        .catch(error => {
+            console.error('Error during image upload:', error);
+            alert('Image upload failed');
+        });
 
-            const formData = new FormData();
-            const imageInput = document.getElementById("studentImages");
-
-            for (let i = 0; i < imageInput.files.length; i++) {
-              formData.append("images", imageInput.files[i]);
-            }
-
-            formData.append("userId", userId); // Add user ID to form data
-
-            fetch(`http://localhost:5500/upload/${userId}`, {
-              method: "POST",
-              body: formData,
-            })
-              .then((response) => response.text())
-              .then((data) => {
-                console.log(data);
-                alert("Images uploaded successfully");
-                // Hide the image upload form after successful upload
-                document.getElementById("image-upload-form").style.display = "none";
-              });
-          });
-      }
     });
-  }
-   // Fetch user information when the page loads
-   fetchUserInfo();
 
-   // Function to fetch and display the user information
-   function fetchUserInfo() {
-     const userType = sessionStorage.getItem('userType');
-     const userId = sessionStorage.getItem('userId'); // Retrieve the appropriate user ID
-     const userName = sessionStorage.getItem('userName'); // Retrieve the appropriate user name
- 
-     if (userType && userId) {
-       // Update the dashboard with UserType, UserID, and UserName
-       document.getElementById('userType').textContent = userType;
-       document.getElementById('userID').textContent = userId;
-       document.getElementById('userName').textContent = userName; // Display userName
-     }
-   }
+    function displayUserDetails() {
+        const userType = sessionStorage.getItem('userType');
+        const userId = sessionStorage.getItem('userId');
+        const userName = sessionStorage.getItem('userName');
+
+        if (userType && userId && userName) {
+            // Display user information on the page
+            document.getElementById('userType').textContent = userType;
+            document.getElementById('userID').textContent = userId;
+            document.getElementById('userName').textContent = userName;
+        }
+    }
+    
+    // Handle button click to redirect to attendance.html
+    const attendanceButton = document.getElementById('attendanceButton');
+    attendanceButton.addEventListener('click', function () {
+        // Redirect to the attendance.html page
+        window.location.href = 'attendance.html';
+    });
 };
-
-function checkIfImagesUploaded(userId) {
-  return fetch(`http://localhost:5500/checkupload/${userId}`)
-    .then((response) => response.json())
-    .then((data) => data);
-}
-
-document.getElementById("take-attendance-button").addEventListener("click", function () {
-  window.location.href = "attendance.html";
-});
-
