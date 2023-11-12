@@ -1,4 +1,5 @@
-<!-- <!DOCTYPE html>
+<!-- for buttons reference what should put only
+    <!DOCTYPE html>
 <html>
 <head>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -108,64 +109,120 @@
 </html>
 
 
+<!-- Example of admin dashboard without any buttons
+<style>
+/* Basic reset for styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-<!-- <div class="dashboard">
-            <nav class="navbar navbar-expand-lg navbar-dark">
-                <a class="navbar-brand" href="#">Student Attendance System</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Dashboard</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="user-profile">
-                    <img src="profile-pic.jpg" alt="User Profile Picture" class="profile-pic">
-                    <div class="user-menu">
-                        <button class="btn btn-link" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            User Name
-                        </button>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="#">Edit Profile</a>
-                            <a class="dropdown-item" href="#">Settings</a>
-                            <a class="dropdown-item" href="#">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-            <div class="container-fluid">
-                <div class="row">
-                    <nav class="col-md-2 sidebar">
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link active" href="#">Timetable Management</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">View Online Absent Form</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Modifications Student's Attendance</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Register Student & Lecturer Profile</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">Register & Modify Course Structure</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">See Class Status</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#">View Attendance Report</a>
-                            </li>
-                        </ul>
-                    </nav>
-                    <main role="main" class="col-md-9 ml-sm-auto col-lg-10 content">
-                         Add your content here, including the calendar or note-writing function 
-                    </main>
-                </div>
-            </div>
-        </div>-->
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #EBE9E9; /* Light grey background */
+}
+
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #3581B8; /* Blue for sidebar */
+    color: #F3F8F2; /* Light green for text */
+    padding: 20px;
+}
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #F3F8F2; /* Light green for main content background */
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.statistics {
+    background-color: #DEE2D6; /* Light olive for statistics background */
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    /* Add your chart styling here */
+}
+
+.calendar, .notices, .gallery {
+    background-color: #FFFFFF; /* White for these sections */
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.notice, .gallery-item {
+    margin-bottom: 10px;
+}
+
+/* Responsive grid for the gallery */
+.gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-gap: 10px;
+}
+
+/* Style for buttons or interactive elements */
+.button {
+    background-color: #FCB07E; /* Peach for buttons */
+    color: #3581B8; /* Blue for button text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Hover effect for buttons */
+.button:hover {
+    background-color: #F3F8F2; /* Light green for hover */
+}
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+/* Add your CSS styles here */
+</style>
+</head>
+<body>
+<div class="dashboard">
+    <aside class="sidebar">
+        <!-- Navigation links -->
+    <!-- </aside>
+    <main class="main-content">
+        <header class="header">
+            <!-- Search bar, profile picture, etc. -->
+           <!--</header>
+        <section class="statistics">
+            <!-- Graphs and statistics -->
+            <!--</section>
+        <section class="calendar">
+            <!-- Calendar view -->
+            <!--</section>
+        <section class="notices">
+            <!-- Notices and upcoming events -->
+            <!--</section>
+        <section class="gallery">
+            <!-- Image gallery -->
+      <!--/section>
+    </main>
+</div>
+</body>
+</html>
+-->
