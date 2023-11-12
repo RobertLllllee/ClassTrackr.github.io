@@ -1,41 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style\studentStyle.css">
-    <title>Student Page</title>
-    <link rel="stylesheet" type="text/css" href="style\studentStyle.css">
+  <link rel="stylesheet" href="style\studentStyle.css">
+  <title>Student Dashboard</title>
 </head>
 <body>
-    
-    <div class="container">
-        <h1>Welcome, Student!</h1>
-        <div id="userInfo">
-            <p>User Type: <span id="userType"></span></p>
-            <p>User ID: <span id="userID"></span></p>
-            <p>User Name: <span id="userName"></span></p>
-        </div>
+  <h1>Welcome, <span id="userName"></span>!</h1>
+  <p>User Type: <span id="userType"></span></p>
+  <p>User ID: <span id="userID"></span></p>
+  
+    <!-- Image Upload Form -->
+    <form id="imageUploadForm" enctype="multipart/form-data">
+      <label for="imageFile">Upload Your Image:</label>
+      <input type="file" id="imageFile" name="image">
+      <input type="submit" value="Upload Image">
+  </form>
 
-        <form id="image-upload-form" style="display: none;">
-            <label for="studentImages">Upload Your Image:</label><br>
-            <input type="file" id="studentImages" name="studentImages" accept="image/*" multiple>
-            <input type="submit" value="Upload Image">
-        </form>
+  <button id="attendanceButton">Take Attendance</button>
 
-
-        <div id="student-image-section" style="display: none;">
-            <h2>Your Image:</h2>
-            <img id="studentImage" src="" alt="Your image">
-        </div>
-
-
-        <button id="take-attendance-button">Take Attendance</button>
-    </div>
-
-    <script src="script\student.js"></script> 
-
+  <script src="script\student.js"></script>
 </body>
 </html>
-
-
