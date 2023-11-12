@@ -23,7 +23,7 @@
 
         <div id="studentFields" style="display: none;">
             <label for="StudentID">Student ID:</label><br>
-            <input type="text" id="StudentID" name="StudentID"><br>
+            <input type text="id" id="StudentID" name="StudentID"><br>
             <label for="StudentPass">Password:</label><br>
             <input type="password" id="StudentPass" name="StudentPass"><br>
         </div>
@@ -38,37 +38,6 @@
         <input type="submit" value="Login">
     </form>
 
-    <!-- This form will be shown only after successful login -->
-    <form id="image-upload-form" style="display: none;">
-        <label for="studentImages">Upload Student Images:</label><br>
-        <input type="file" id="studentImages" name="studentImages" accept="image/*" multiple><br>
-        <input type="submit" value="Upload Images">
-    </form>
-</div>
-
-<script src="script/index.js"></script>
-
-<script>
-   function changeFields() {
-            const userType = document.getElementById('UserType').value;
-            
-            document.getElementById('adminFields').style.display = 'none';
-            document.getElementById('studentFields').style.display = 'none';
-            document.getElementById('instructorFields').style.display = 'none';
-            
-            switch(userType) {
-                case 'Administrator':
-                    document.getElementById('adminFields').style.display = 'block';
-                    break;
-                case 'Student':
-                    document.getElementById('studentFields').style.display = 'block';
-                    break;
-                case 'Instructor':
-                    document.getElementById('instructorFields').style.display = 'block';
-                    break;
-            }
-        }
-</script>
-
+    <script src="script\index.js"></script>
 </body>
 </html>

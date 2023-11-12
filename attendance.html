@@ -1,21 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link rel="stylesheet" href="style\attendanceStyle.css">
-    <title>Face Recognition Attendance</title>
+  <link rel="stylesheet" href="style\attendanceStyle.css">
+  <title>Take Attendance</title>
 </head>
 <body>
-    <h1>Face Recognition Attendance</h1>
-    <video id="video" width="640" height="480" autoplay></video>
-    <canvas id="overlay" width="640" height="480"></canvas>
-    <p id="studentName">Student Name: </p>
-    <script>
-        // Set the user ID as a global variable
-        const userId = '<%= userId %>'; // Replace '<%= userId %>' with your template variable
-      </script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="script/face-api.js"></script>
-    <script src="script/face-api.min.js"></script>
-    <script src="script/attendance.js"></script>
+  <h1>Take Attendance</h1>
+  <button id="takeAttendanceButton" onclick="getLocation()">Take Attendance</button>
+  <div id="resultMessage"></div>
+  <div id="studentInfo">
+    <p>Student Name: <span id="studentName"></span></p>
+    <p>Student ID: <span id="studentID"></span></p>
+  </div>
+
+  <script src="script\location.js"></script>
+  <script src="script\face-api.js"></script>
+  <script src="script\attendance.js"></script>
 </body>
 </html>
