@@ -64,6 +64,11 @@ function generateQRCode() {
     // Save the generated code to localStorage
     localStorage.setItem("generatedCode", customFormat);
 
+    // Redirect if the QR code is scanned
+    qrContainer.addEventListener("click", function() {
+    window.location.href = "attendance.html";
+    });
+
 
     const expirationTime = new Date().getTime() + 5 * 60 * 1000; // 5 minutes in milliseconds
 
