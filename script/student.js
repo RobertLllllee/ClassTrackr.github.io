@@ -60,10 +60,9 @@ window.onload = function() {
         }
     }
     
-    // Handle button click to redirect to attendance.html
-    const attendanceButton = document.getElementById('attendanceButton');
-    attendanceButton.addEventListener('click', function () {
-        // Redirect to the attendance.html page
-        window.location.href = 'attendance.html';
-    });
 };
+    // JavaScript function to redirect to QR.html
+    function redirecttocodeinsert() {
+    // Change window.location to the path of your QR.html file
+    window.location.href = 'attendancecode.html';
+}
