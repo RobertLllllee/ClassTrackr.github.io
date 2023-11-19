@@ -6,13 +6,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-}
+} */
 
 canvas {
     position: absolute;
 }
 
-.success-message {
+video {
+    position: absolute;
+}
+
+/* .success-message {
     position: fixed;
     top: 20px;
     left: 20px;

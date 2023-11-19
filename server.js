@@ -201,7 +201,7 @@ const app = express();
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
-// const tf = require('@tensorflow/tfjs-node');
+const tf = require('@tensorflow/tfjs');
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -304,109 +304,58 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Load a pre-trained face recognition model
-async function loadFaceRecognitionModel() {
-  // Replace 'path/to/your/model.json' with the actual path to your TensorFlow.js face recognition model JSON file
-  const model = await tf.loadLayersModel('Model.json');
-  return model;
-}
-
-// Preprocess the image and convert it to a tensor
-function preprocessImage(imageBuffer) {
-  // Placeholder for image preprocessing logic
-  const image = tf.node.decodeImage(imageBuffer);
-  
-  // Convert to grayscale if needed
-  const grayscaleImage = image.mean(2);
-
-  // Resize the image if needed (adjust dimensions based on your model requirements)
-  const resizedImage = tf.image.resizeBilinear(grayscaleImage, [160, 160]);
-
-  // Normalize pixel values to be in the range [0, 1]
-  const normalizedImage = resizedImage.div(255.0);
-
-  // Expand dimensions to match model input shape (batch size of 1)
-  const expandedImage = normalizedImage.expandDims(0);
-
-  // Cleanup: Dispose of intermediate tensors
-  image.dispose();
-  grayscaleImage.dispose();
-  resizedImage.dispose();
-  normalizedImage.dispose();
-
-  return expandedImage;
-}
-
-// Compute embeddings for the given image using the loaded model
-async function computeEmbeddingsForStudentImage(model, imageBuffer) {
-  // Preprocess the image
-  const preprocessedImage = preprocessImage(imageBuffer);
-
-  // Make predictions with the model to get embeddings
-  const embeddings = model.predict(preprocessedImage);
-
-  // Convert embeddings tensor to a JavaScript array
-  const embeddingsArray = embeddings.arraySync()[0];
-
-  // Cleanup: Dispose of intermediate tensors
-  preprocessedImage.dispose();
-  embeddings.dispose();
-
-  return embeddingsArray;
-}
-
-// Image upload route
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
-
-app.post('/uploadImage', upload.single('image'), async (req, res) => {
-  try {
-    if (!req.file) {
-      console.log('No image file provided');
-      return res.status(400).json({ success: false, message: 'No image file provided' });
-    }
-
-    const studentID = req.body.studentID;
-    console.log('Student ID:', studentID);
-    const imageBuffer = req.file.buffer;
-    console.log('Image received:', imageBuffer);
-
-    // Store the image in the StudentImages collection
-    const studentImages = client.db('Entities').collection('StudentImages');
-    const resultImage = await studentImages.insertOne({ StudentID: studentID, ImageData: imageBuffer });
-    console.log('Insert image result:', resultImage);
-
-    if (resultImage.acknowledged) {
-      // Compute and store embeddings in the StudentDescriptors collection
-      const model = await loadFaceRecognitionModel();
-      const embeddings = await computeEmbeddingsForStudentImage(model, imageBuffer);
-      
-      const studentDescriptorsCollection = client.db('Entities').collection('StudentDescriptors');
-      const resultEmbeddings = await studentDescriptorsCollection.updateOne(
-        { StudentID: studentID },
-        { $set: { Embeddings: embeddings } },
-        { upsert: true }
-      );
-
-      if (resultEmbeddings.acknowledged) {
-        console.log('Embeddings stored successfully');
-        res.json({ success: true, message: 'Image upload and embeddings stored successfully' });
-      } else {
-        console.log('Failed to store embeddings');
-        res.status(500).json({ success: false, message: 'Failed to store embeddings' });
-      }
-    } else {
-      console.log('Image upload failed');
-      res.status(500).json({ success: false, message: 'Image upload failed' });
-    }
-  } catch (error) {
-    console.error('Error during image upload:', error);
-    // Handle errors appropriately
-    res.status(500).json({ success: false, message: 'Error during image upload', error: error.message });
-  }
-});
-
 app.listen(5500, () => console.log('Server Started!'));
+
+// // Load a pre-trained face recognition model
+// async function loadFaceRecognitionModel() {
+//   // Replace 'path/to/your/model.json' with the actual path to your TensorFlow.js face recognition model JSON file
+//   const model = await tf.loadLayersModel('https://storage.googleapis.com/tfjs-models/demos/face-detection/index.html?model=mediapipe_face_detector');
+//   return model;
+// }
+
+// // Preprocess the image and convert it to a tensor
+// function preprocessImage(imageBuffer) {
+//   // Placeholder for image preprocessing logic
+//   const image = tf.node.decodeImage(imageBuffer);
+  
+//   // Convert to grayscale if needed
+//   const grayscaleImage = image.mean(2);
+
+//   // Resize the image if needed (adjust dimensions based on your model requirements)
+//   const resizedImage = tf.image.resizeBilinear(grayscaleImage, [160, 160]);
+
+//   // Normalize pixel values to be in the range [0, 1]
+//   const normalizedImage = resizedImage.div(255.0);
+
+//   // Expand dimensions to match model input shape (batch size of 1)
+//   const expandedImage = normalizedImage.expandDims(0);
+
+//   // Cleanup: Dispose of intermediate tensors
+//   image.dispose();
+//   grayscaleImage.dispose();
+//   resizedImage.dispose();
+//   normalizedImage.dispose();
+
+//   return expandedImage;
+// }
+
+// // Compute embeddings for the given image using the loaded model
+// async function computeEmbeddingsForStudentImage(model, imageBuffer) {
+//   // Preprocess the image
+//   const preprocessedImage = preprocessImage(imageBuffer);
+
+//   // Make predictions with the model to get embeddings
+//   const embeddings = model.predict(preprocessedImage);
+
+//   // Convert embeddings tensor to a JavaScript array
+//   const embeddingsArray = embeddings.arraySync()[0];
+
+//   // Cleanup: Dispose of intermediate tensors
+//   preprocessedImage.dispose();
+//   embeddings.dispose();
+
+//   return embeddingsArray;
+// }
 
 // // Image upload route
 // const storage = multer.memoryStorage();
@@ -431,7 +380,9 @@ app.listen(5500, () => console.log('Server Started!'));
 
 //     if (resultImage.acknowledged) {
 //       // Compute and store embeddings in the StudentDescriptors collection
-//       const embeddings = await computeEmbeddingsForStudentImage(imageBuffer); // Implement this function
+//       const model = await loadFaceRecognitionModel();
+//       const embeddings = await computeEmbeddingsForStudentImage(model, imageBuffer);
+      
 //       const studentDescriptorsCollection = client.db('Entities').collection('StudentDescriptors');
 //       const resultEmbeddings = await studentDescriptorsCollection.updateOne(
 //         { StudentID: studentID },
@@ -453,10 +404,11 @@ app.listen(5500, () => console.log('Server Started!'));
 //   } catch (error) {
 //     console.error('Error during image upload:', error);
 //     // Handle errors appropriately
+//     res.status(500).json({ success: false, message: 'Error during image upload', error: error.message });
 //   }
 // });
 
-// app.listen(5500, () => console.log('Server Started!'));
+
 
 // // Image upload route
 // const storage = multer.memoryStorage();
@@ -499,52 +451,4 @@ app.listen(5500, () => console.log('Server Started!'));
 // });
 
 // app.listen(5500, () => console.log('Server Started!'));
-
-// app.post('/generateDescriptor', async (req, res) => {
-//   try {
-//     const studentID = req.body.studentID;
-//     console.log('Generating face descriptor for Student ID:', studentID);
-
-//     // Retrieve the image data from the StudentImages collection
-//     const studentImages = client.db('Entities').collection('StudentImages');
-//     const storedImage = await studentImages.findOne({ StudentID: studentID });
-
-//     if (storedImage) {
-//       // Generate face descriptors using face-api.js
-//       const img = await faceapi.bufferToImage(Buffer.from(storedImage.ImageData));
-//       const detections = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
-
-//       if (detections) {
-//         const faceDescriptor = detections.descriptor;
-
-//         // Store the face descriptor in the StudentDescriptors collection
-//         const studentDescriptors = client.db('Entities').collection('StudentDescriptors');
-//         const resultDescriptor = await studentDescriptors.insertOne({ StudentID: studentID, FaceDescriptor: faceDescriptor });
-//         console.log('Insert descriptor result:', resultDescriptor);
-
-//         if (resultDescriptor.acknowledged) {
-//           console.log('Face descriptor generation and upload successful');
-//           res.json({ success: true, message: 'Face descriptor generation and upload successful' });
-//         } else {
-//           console.log('Face descriptor upload failed');
-//           res.status(500).json({ success: false, message: 'Face descriptor upload failed' });
-//         }
-//       } else {
-//         console.log('No face detected in the uploaded image');
-//         res.status(400).json({ success: false, message: 'No face detected in the uploaded image' });
-//       }
-//     } else {
-//       console.log('No image found for the provided Student ID');
-//       res.status(400).json({ success: false, message: 'No image found for the provided Student ID' });
-//     }
-//   } catch (error) {
-//     console.error('Error during face descriptor generation:', error);
-//     res.status(500).json({ success: false, message: 'Error during face descriptor generation', error: error.message });
-//   }
-// });
-
-
-
-
-
 
