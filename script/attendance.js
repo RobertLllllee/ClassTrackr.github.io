@@ -1,4 +1,21 @@
 console.log('attendance.js loaded');
+window.onload = function() {
+  // Fetch user information when the page loads
+  fetchUserInfo();
+
+  // Function to fetch and display the user information
+  function fetchUserInfo() {
+    const userId = sessionStorage.getItem('userId'); // Retrieve the appropriate user ID
+    const userName = sessionStorage.getItem('userName'); // Retrieve the appropriate user name
+
+    if (userId) {
+      // Update the dashboard with UserType, UserID, and UserName
+      document.getElementById('userID').textContent = userId;
+      document.getElementById('userName').textContent = userName; // Display userName
+    }
+  }
+};
+
 async function performFacialRecognition() {
   Promise.all([
     faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
