@@ -44,7 +44,7 @@
 //     }
 //   });
   
-
+async function getLocation() {
 //With Exceeding 10 meters functions and location track and check functions
 // Define the corners of your campus and acceptable altitude range
 var campusCorners = [
@@ -141,3 +141,27 @@ setInterval(function () {
     warnUserIfTenMetersAway(lat, lon);
   }
 }, 5 * 1000); // 5 seconds in milliseconds
+
+return true;
+}
+
+async function sendLocationData(lat, lon, alt) {
+  try {
+    const response = await fetch('http://localhost:5500/markAttendance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        lat: lat,
+        lon: lon,
+        alt: alt,
+      }),
+    });
+
+    const data = await response.json();
+    console.log(data);
+  } catch (error) {
+    console.error('Error sending location data:', error);
+  }
+}

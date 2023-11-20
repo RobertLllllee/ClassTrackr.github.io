@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <link rel="stylesheet" href="style\attendanceStyle.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style/attendanceStyle.css">
   <title>Take Attendance</title>
 </head>
 <body>
   <h1>Take Attendance</h1>
   <button id="takeAttendanceButton" onclick="getLocation()">Take Attendance</button><br><br>
-  <video id="video" width="600" height="450" autoplay>
+  <video id="video" width="600" height="450" autoplay></video>
   <div id="resultMessage"></div>
   <div id="studentInfo">
     <p>Student Name: <span id="studentName"></span></p>
     <p>Student ID: <span id="studentID"></span></p>
   </div>
 
-  <script src="script\face-api.min.js"></script>
-  <script src="script\location.js"></script>
-  <script src="script\attendance.js"></script>
+  <script src="script/face-api.min.js"></script>
+  <script src="script/location.js"></script>
+  <script src="script/attendance.js"></script>
 </body>
 </html>
 

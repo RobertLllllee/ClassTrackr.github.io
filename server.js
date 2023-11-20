@@ -201,7 +201,6 @@ const app = express();
 const multer = require('multer');
 const path = require('path');
 const cors = require('cors');
-const tf = require('@tensorflow/tfjs');
 
 app.use(express.json());
 app.use(express.static('public'));
@@ -301,6 +300,44 @@ app.post('/login', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.json({ success: false, message: 'Error occurred' });
+  }
+});
+
+app.post('/markAttendance', async (req, res) => {
+  try {
+    if (!req.body.image || !req.body.lat || !req.body.lon || !req.body.alt) {
+      res.status(400).json({ success: false, message: 'Invalid request. Please provide image data, latitude, longitude, and altitude.' });
+      return;
+    }
+
+    // Check if the request contains image data
+    const imageData = req.body.image;
+
+    // Check if the request contains location data
+    const lat = req.body.lat;
+    const lon = req.body.lon;
+    const alt = req.body.alt;
+
+    // Perform facial recognition check
+    const isFacialRecognitionSuccessful = performFacialRecognition(imageData);
+
+    // Perform location tracking check
+    const isLocationTrackingSuccessful = isWithinCampus(lat, lon, alt) && !isTenMetersAway(lat, lon);
+
+    // Check the results of both checks
+    if (isFacialRecognitionSuccessful && isLocationTrackingSuccessful) {
+      // Mark attendance in the database or perform any other necessary actions
+      res.json({ success: true, message: 'Attendance marked successfully' });
+    } else if (!isFacialRecognitionSuccessful && !isLocationTrackingSuccessful) {
+      res.status(400).json({ success: false, message: 'Attendance not marked. Facial recognition and location tracking both failed.' });
+    } else if (!isFacialRecognitionSuccessful) {
+      res.status(400).json({ success: false, message: 'Attendance not marked. Facial recognition failed.' });
+    } else if (!isLocationTrackingSuccessful) {
+      res.status(400).json({ success: false, message: 'Attendance not marked. Location tracking failed.' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Internal server error occurred' });
   }
 });
 
