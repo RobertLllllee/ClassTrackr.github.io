@@ -97,10 +97,81 @@ setInterval(function () {
 // Call getLocation with a callback to trigger facial recognition if successful
 getLocation(function (success) {
   if (success) {
-    // Start facial recognition
-    startFacialRecognition();
+    // Load facial recognition models and start webcam
+    Promise.all([
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    ])
+      .then(function () {
+        return navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        });
+      })
+      .then(function (stream) {
+        video.srcObject = stream;
+      })
+      .then(function () {
+        // Start facial recognition
+        startFacialRecognition();
+      })
+      .catch(function (error) {
+        console.error('Error setting up facial recognition:', error);
+      });
   }
 });
+
+// Function to start facial recognition
+function startFacialRecognition() {
+  try {
+    // Get labeled face descriptions
+    getLabeledFaceDescriptions().then(function (labeledFaceDescriptors) {
+      const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+
+      const canvas = faceapi.createCanvasFromMedia(video);
+      document.body.append(canvas);
+
+      const displaySize = { width: video.width, height: video.height };
+      faceapi.matchDimensions(canvas, displaySize);
+
+      setInterval(async () => {
+        try {
+          const detections = await faceapi
+            .detectAllFaces(video)
+            .withFaceLandmarks()
+            .withFaceDescriptors();
+
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+          canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+          const results = resizedDetections.map((d) => {
+            return faceMatcher.findBestMatch(d.descriptor);
+          });
+
+          results.forEach((result, i) => {
+            const box = resizedDetections[i].detection.box;
+            const drawBox = new faceapi.draw.DrawBox(box, {
+              label: result,
+            });
+            drawBox.draw(canvas);
+
+            // Display a message when a face is recognized
+            console.log('Recognized:', result.label);
+          });
+        } catch (error) {
+          console.error('Error during facial recognition:', error);
+        }
+      }, 100);
+    });
+  } catch (error) {
+    console.error('Error setting up facial recognition:', error);
+  }
+
+  // Display a success message for passing both location and recognition
+  document.getElementById('resultMessage').innerHTML = 'Attendance taken and recognized successfully!';
+}
 
 // Without Exceeding 10 meters functions Only location checking functions
 // Define the corners of your campus and acceptable altitude range
