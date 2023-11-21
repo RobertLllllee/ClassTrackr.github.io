@@ -3,7 +3,7 @@ console.log('attendance.js loaded');
 // Move the getLabeledFaceDescriptions function here
 async function getLabeledFaceDescriptions() {
   try {
-    const labels = ["JunHong"];
+    const labels = ["JunHong" || "YongJun" || "ShiJie"];
     return await Promise.all(
       labels.map(async (label) => {
         const descriptions = [];
@@ -25,6 +25,8 @@ async function getLabeledFaceDescriptions() {
 }
 
 window.onload = function () {
+  let recognitionSuccessful = false; // Flag to track if recognition is successful
+
   // Fetch user information when the page loads
   fetchUserInfo();
 
@@ -100,6 +102,7 @@ window.onload = function () {
 
               // Display a message when a face is recognized
               console.log('Recognized:', result.label);
+              recognitionSuccessful = true; // Set the flag to true
             });
           } catch (error) {
             console.error('Error during facial recognition:', error);
@@ -111,7 +114,9 @@ window.onload = function () {
     });
 
     // Display a success message for passing both location and recognition
-    document.getElementById('resultMessage').innerHTML = 'Attendance taken and recognized successfully!';
+    if (recognitionSuccessful) {
+      document.getElementById('resultMessage').innerHTML = 'Attendance taken and recognized successfully!';
+    }
   }
 
   // Call getLocation with a callback to trigger facial recognition if successful
@@ -122,7 +127,6 @@ window.onload = function () {
     }
   });
 };
-
 
 // console.log('attendance.js loaded');
 // window.onload = function() {
