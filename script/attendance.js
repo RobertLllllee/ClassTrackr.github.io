@@ -1,5 +1,30 @@
 console.log('attendance.js loaded');
-window.onload = function() {
+
+// Move the getLabeledFaceDescriptions function here
+async function getLabeledFaceDescriptions() {
+  try {
+    const labels = ["JunHong"];
+    return await Promise.all(
+      labels.map(async (label) => {
+        const descriptions = [];
+        for (let i = 1; i <= 3; i++) {
+          const img = await faceapi.fetchImage(`./labels/${label}/${i}.jpg`);
+          const detections = await faceapi
+            .detectSingleFace(img)
+            .withFaceLandmarks()
+            .withFaceDescriptor();
+          descriptions.push(detections.descriptor);
+        }
+        return new faceapi.LabeledFaceDescriptors(label, descriptions);
+      })
+    );
+  } catch (error) {
+    console.error('Error getting labeled face descriptions:', error);
+    return [];
+  }
+}
+
+window.onload = function () {
   // Fetch user information when the page loads
   fetchUserInfo();
 
@@ -14,161 +39,220 @@ window.onload = function() {
       document.getElementById('userName').textContent = userName; // Display userName
     }
   }
-};
 
-async function performFacialRecognition() {
-  Promise.all([
-    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-    faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-  ])
-    .then(startWebcam)
-    .catch((error) => {
-      console.error('Error loading face recognition models:', error);
-    });
-  
-  function startWebcam() {
-    navigator.mediaDevices
-      .getUserMedia({
-        video: true,
-        audio: false,
-      })
-      .then((stream) => {
-        video.srcObject = stream;
-      })
+  function startFacialRecognition() {
+    Promise.all([
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+    ])
+      .then(startWebcam)
       .catch((error) => {
-        console.error('Error accessing camera:', error);
+        console.error('Error loading face recognition models:', error);
       });
-  }
-  
-  async function getLabeledFaceDescriptions() {
-    try {
-      const labels = ["JunHong"];
-      return await Promise.all(
-        labels.map(async (label) => {
-          const descriptions = [];
-          for (let i = 1; i <= 3; i++) {
-            const img = await faceapi.fetchImage(`./labels/${label}/${i}.jpg`);
-            const detections = await faceapi
-              .detectSingleFace(img)
-              .withFaceLandmarks()
-              .withFaceDescriptor();
-            descriptions.push(detections.descriptor);
-          }
-          return new faceapi.LabeledFaceDescriptors(label, descriptions);
+
+    function startWebcam() {
+      navigator.mediaDevices
+        .getUserMedia({
+          video: true,
+          audio: false,
         })
-      );
-    } catch (error) {
-      console.error('Error getting labeled face descriptions:', error);
-      return [];
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error('Error accessing camera:', error);
+        });
     }
-  }
-  
-  video.addEventListener("play", async () => {
-    try {
-      const labeledFaceDescriptors = await getLabeledFaceDescriptions();
-      const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-  
-      const canvas = faceapi.createCanvasFromMedia(video);
-      document.body.append(canvas);
-  
-      const displaySize = { width: video.width, height: video.height };
-      faceapi.matchDimensions(canvas, displaySize);
-  
-      setInterval(async () => {
-        try {
-          const detections = await faceapi
-            .detectAllFaces(video)
-            .withFaceLandmarks()
-            .withFaceDescriptors();
-  
-          const resizedDetections = faceapi.resizeResults(detections, displaySize);
-  
-          canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-  
-          const results = resizedDetections.map((d) => {
-            return faceMatcher.findBestMatch(d.descriptor);
-          });
-  
-          results.forEach((result, i) => {
-            const box = resizedDetections[i].detection.box;
-            const drawBox = new faceapi.draw.DrawBox(box, {
-              label: result,
+
+    video.addEventListener("play", async () => {
+      try {
+        const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+        const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+
+        const canvas = faceapi.createCanvasFromMedia(video);
+        document.body.append(canvas);
+
+        const displaySize = { width: video.width, height: video.height };
+        faceapi.matchDimensions(canvas, displaySize);
+
+        setInterval(async () => {
+          try {
+            const detections = await faceapi
+              .detectAllFaces(video)
+              .withFaceLandmarks()
+              .withFaceDescriptors();
+
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+            const results = resizedDetections.map((d) => {
+              return faceMatcher.findBestMatch(d.descriptor);
             });
-            drawBox.draw(canvas);
-  
-            // Display a message when a face is recognized
-            console.log('Recognized:', result.label);
-          });
-        } catch (error) {
-          console.error('Error during facial recognition:', error);
-        }
-      }, 100);
-    } catch (error) {
-      console.error('Error setting up facial recognition:', error);
+
+            results.forEach((result, i) => {
+              const box = resizedDetections[i].detection.box;
+              const drawBox = new faceapi.draw.DrawBox(box, {
+                label: result,
+              });
+              drawBox.draw(canvas);
+
+              // Display a message when a face is recognized
+              console.log('Recognized:', result.label);
+            });
+          } catch (error) {
+            console.error('Error during facial recognition:', error);
+          }
+        }, 100);
+      } catch (error) {
+        console.error('Error setting up facial recognition:', error);
+      }
+    });
+
+    // Display a success message for passing both location and recognition
+    document.getElementById('resultMessage').innerHTML = 'Attendance taken and recognized successfully!';
+  }
+
+  // Call getLocation with a callback to trigger facial recognition if successful
+  getLocation(function (success) {
+    if (success) {
+      // Start facial recognition
+      startFacialRecognition();
     }
   });
+};
 
-return true;
-}
 
-async function sendAttendanceData(imageData) {
-  try {
-    const response = await fetch('http://localhost:5500/markAttendance', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        image: imageData, // Pass the captured image data here
-      }),
-    });
+// console.log('attendance.js loaded');
+// window.onload = function() {
+//   // Fetch user information when the page loads
+//   fetchUserInfo();
 
-    const data = await response.json();
-    console.log(data);
-  } catch (error) {
-    console.error('Error sending attendance data:', error);
-  }
-}
+//   // Function to fetch and display the user information
+//   function fetchUserInfo() {
+//     const userId = sessionStorage.getItem('userId'); // Retrieve the appropriate user ID
+//     const userName = sessionStorage.getItem('userName'); // Retrieve the appropriate user name
 
-document.getElementById('takeAttendanceButton').addEventListener('click', async () => {
-  try {
-    // Perform facial recognition (replace this with your actual logic)
-    const isFacialRecognitionSuccessful = await performFacialRecognition();
+//     if (userId) {
+//       // Update the dashboard with UserType, UserID, and UserName
+//       document.getElementById('userID').textContent = userId;
+//       document.getElementById('userName').textContent = userName; // Display userName
+//     }
+//   }
+// };
 
-    // Check if the user is inside the location (replace this with your actual logic)
-    const isInsideLocation = await getLocation();
+// // Function to start facial recognition
+// async function startFacialRecognition() {
+//   try {
+//     const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+//     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
 
-    // Trigger attendance marking if both conditions are met
-    if (isFacialRecognitionSuccessful && isInsideLocation) {
-      const response = await fetch('http://localhost:5500/markAttendance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          // No need to send additional data if not required on the server
-        }),
-      });
+//     const canvas = faceapi.createCanvasFromMedia(video);
+//     document.body.append(canvas);
 
-      const data = await response.json();
+//     const displaySize = { width: video.width, height: video.height };
+//     faceapi.matchDimensions(canvas, displaySize);
 
-      // Handle the server response here (display success message, no need to get anything)
-      if (data.success) {
-        // Display success message
-        console.log('Attendance marked successfully');
-      } else {
-        // Display error message
-        console.error('Failed to mark attendance:', data.message);
-      }
-    } else {
-      // Display a message indicating that conditions are not met
-      console.log('Conditions for attendance marking are not met.');
-    }
-  } catch (error) {
-    console.error('Error during attendance marking:', error);
-  }
-});
+//     setInterval(async () => {
+//       try {
+//         const detections = await faceapi
+//           .detectAllFaces(video)
+//           .withFaceLandmarks()
+//           .withFaceDescriptors();
+
+//         const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+//         canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+
+//         const results = resizedDetections.map((d) => {
+//           return faceMatcher.findBestMatch(d.descriptor);
+//         });
+
+//         results.forEach((result, i) => {
+//           const box = resizedDetections[i].detection.box;
+//           const drawBox = new faceapi.draw.DrawBox(box, {
+//             label: result,
+//           });
+//           drawBox.draw(canvas);
+
+//           // Display a message when a face is recognized
+//           console.log('Recognized:', result.label);
+//         });
+//       } catch (error) {
+//         console.error('Error during facial recognition:', error);
+//       }
+//     }, 100);
+
+//     // Display a success message for facial recognition
+//     document.getElementById('resultMessage').innerHTML = 'Facial recognition successful!';
+//   } catch (error) {
+//     console.error('Error setting up facial recognition:', error);
+//     // Display an error message for facial recognition failure
+//     document.getElementById('resultMessage').innerHTML = 'Error during facial recognition';
+//   }
+// }
+
+// // Call startFacialRecognition when the page loads
+// startFacialRecognition();
+
+// async function sendAttendanceData(imageData) {
+//   try {
+//     const response = await fetch('http://localhost:5500/markAttendance', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         image: imageData, // Pass the captured image data here
+//       }),
+//     });
+
+//     const data = await response.json();
+//     console.log(data);
+//   } catch (error) {
+//     console.error('Error sending attendance data:', error);
+//   }
+// }
+
+// document.getElementById('takeAttendanceButton').addEventListener('click', async () => {
+//   try {
+//     // Perform facial recognition (replace this with your actual logic)
+//     const isFacialRecognitionSuccessful = await performFacialRecognition();
+
+//     // Check if the user is inside the location (replace this with your actual logic)
+//     const isInsideLocation = await getLocation();
+
+//     // Trigger attendance marking if both conditions are met
+//     if (isFacialRecognitionSuccessful && isInsideLocation) {
+//       const response = await fetch('http://localhost:5500/markAttendance', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify({
+//           // No need to send additional data if not required on the server
+//         }),
+//       });
+
+//       const data = await response.json();
+
+//       // Handle the server response here (display success message, no need to get anything)
+//       if (data.success) {
+//         // Display success message
+//         console.log('Attendance marked successfully');
+//       } else {
+//         // Display error message
+//         console.error('Failed to mark attendance:', data.message);
+//       }
+//     } else {
+//       // Display a message indicating that conditions are not met
+//       console.log('Conditions for attendance marking are not met.');
+//     }
+//   } catch (error) {
+//     console.error('Error during attendance marking:', error);
+//   }
+// });
 
 // const model = faceDetection.SupportedModels.MediaPipeFaceDetector;
 // const detectorConfig = {
