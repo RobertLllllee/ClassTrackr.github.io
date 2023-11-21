@@ -1,3 +1,21 @@
+document.getElementById('sidebar-toggle-btn').addEventListener('click', function() {
+    var sidebar = document.querySelector('.sidebar');
+    var mainHeader = document.querySelector('.main-header');
+    var mainContent = document.querySelector('.main-content');
+    
+    // Check if the sidebar is opened or closed
+    if (sidebar.classList.contains('sidebar-closed')) {
+      sidebar.classList.remove('sidebar-closed');
+      mainHeader.style.left = '255px'; // Adjust this value to match your sidebar width
+      mainContent.style.marginLeft = '250px'; // Adjust this value to match your sidebar's width
+    } else {
+      sidebar.classList.add('sidebar-closed');
+      mainHeader.style.left = '0';
+      mainContent.style.marginLeft = '0';
+    }
+    
+  });
+
 window.onload = function() {
     // Fetch and display user information
     displayUserDetails();

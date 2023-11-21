@@ -1,0 +1,118 @@
+/* Header styles */
+.main-header {
+    background-color: #fcb07e; /* Your desired header background color */
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 255px; /* Adjust this value to match the width of your sidebar */
+    right: 0;
+    height: 40px; /* Adjust this value as needed */
+    z-index: 1000; /* Make sure the header is above other content */
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2); /* Adjust values as necessary */
+    transition: left 0.3s; /* smooth transition for moving the header */
+  }
+  
+  .profile-container {
+      position: relative;
+      float: right;
+      padding: 10px;
+      top: 50%;
+      transform: translateY(-50%); /* Center align vertically */
+    }
+    
+    .profile-icon {
+      width: 40px; /* Adjust size as needed */
+      height: 40px;
+      border-radius: 50%; /* Makes the image round */
+      cursor: pointer;
+      order: 1; /* This ensures the profile icon stays on the right */
+    }
+    
+    .profile-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    
+    .profile-dropdown a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+    
+    .profile-dropdown a:hover {background-color: #f1f1f1;}
+    
+    /* Show the dropdown menu on hover */
+    .profile-container:hover .profile-dropdown {
+      display: block;
+    }
+  
+  .sidebar-toggle {
+      position: absolute;
+      top: 10px; /* Adjust if needed */
+      left: 210px; /* Adjust the left positioning to align with the end of the sidebar */
+      z-index: 2;
+  }
+  
+  /* Sidebar toggle button style */
+  #sidebar-toggle-btn {
+      background: #fcb07e; /* Same as sidebar background color */
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 20px;
+      cursor: pointer;
+      display: block; /* Make it a block element to fit the width */
+      min-width: 60px; /* Full width */
+      text-align: left; /* Align the toggler icon to the left */
+      order: -1; /* This will ensure the toggle button stays on the left */
+  }
+  /* Adjust sidebar padding */
+  .sidebar {
+      padding-top: 0; /* Remove padding at the top of the sidebar */
+  }
+  /* Existing sidebar link styles */
+  .sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #ddd;
+    display: block;
+  }
+  
+  /* New style to add spacing to the icons */
+  .sidebar a i {
+    margin-right: 8px; /* Adjust the spacing as needed */
+  }
+  /* Ensure the button isn't visible when the sidebar is not over the content (mobile view) */
+  @media screen and (max-width: 600px) {
+      .sidebar-toggle {
+          display: none;
+      }
+  }
+  
+  /* Footer Styles */
+  .footer {
+      text-align: center;
+      padding: 10px 0;
+      color: #333; /* Change the text color as needed */
+  }
+  
+  .footer p {
+      margin: 0; /* Removes default margin */
+      padding: 4px; /* Adds some padding for spacing */
+  }
+  
+  /* Dividing line for the footer */
+  .footer hr {
+      border: 0; /* Removes default border */
+      height: 1px; /* Sets the height of the line */
+      background-color: #ccc; /* Sets the line color */
+      margin-bottom: 10px; /* Adds some space between the line and the footer text */
+  }
