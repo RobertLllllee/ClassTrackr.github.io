@@ -126,6 +126,17 @@ window.onload = function () {
       startFacialRecognition();
     }
   });
+
+  // Retrieve the generated details from localStorage
+  const detailsString = localStorage.getItem("generatedDetails");
+  if (detailsString) {
+      const details = JSON.parse(detailsString);
+
+      // Display the details in the HTML
+      document.getElementById('date').textContent = details.date;
+      document.getElementById('timeslot').textContent = details.timeslot;
+      document.getElementById('subject').textContent = details.subject;
+  }
 };
 
 // console.log('attendance.js loaded');

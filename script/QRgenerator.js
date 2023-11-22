@@ -105,6 +105,13 @@ function generateQRCode() {
     const customFormat = generateCustomFormat();
     const qrText = `${date} - ${timeslot} - ${subject} - ${customFormat}`;
 
+    // Log the details to the console
+    console.log("Generated QR Code Details:");
+    console.log("Date:", date);
+    console.log("Timeslot:", timeslot);
+    console.log("Subject:", subject);
+    console.log("Custom Format:", customFormat);
+
     // Clear previous data
     qrContainer.innerHTML = '';
     codeContainer.innerHTML = '';
@@ -126,9 +133,8 @@ function generateQRCode() {
 
     // Redirect if the QR code is scanned
     qrContainer.addEventListener("click", function() {
-    window.location.href = "attendance.html";
+        window.location.href = "attendance.html";
     });
-
 
     const expirationTime = new Date().getTime() + 5 * 60 * 1000; // 5 minutes in milliseconds
 
