@@ -24,7 +24,67 @@ function populateTimeslots() {
     }
 }
 
+async function fetchSubjects(semester) {
+    try {
+        const response = await fetch(`http://localhost:5500/fetchSubjects?semester=${semester}`);
+        const subjects = await response.json();
+
+        const subjectSelect = document.getElementById("subject");
+        subjectSelect.innerHTML = "";
+
+        if (subjects && subjects.length > 0) {
+            subjects.forEach((subject, index) => {
+                const option = document.createElement("option");
+                option.value = subject;
+                option.text = subject;
+                subjectSelect.add(option);
+            });
+        } else {
+            const defaultOption = document.createElement("option");
+            defaultOption.text = "No subjects available";
+            subjectSelect.add(defaultOption);
+        }
+    } catch (error) {
+        console.error('Error fetching subjects:', error);
+    }
+}
+
+async function fetchSemesters() {
+    try {
+        const response = await fetch('http://localhost:5500/fetchSemesters');
+        const semesters = await response.json();
+
+        const semesterSelect = document.getElementById("semester");
+        semesterSelect.innerHTML = "";
+
+        if (semesters && semesters.length > 0) {
+            semesters.forEach((semester, index) => {
+                const option = document.createElement("option");
+                option.value = semester;
+                option.text = semester;
+                semesterSelect.add(option);
+            });
+
+            // Trigger fetching subjects for the default semester
+            const defaultSemester = semesterSelect.value;
+            fetchSubjects(defaultSemester);
+        } else {
+            const defaultOption = document.createElement("option");
+            defaultOption.text = "No semesters available";
+            semesterSelect.add(defaultOption);
+        }
+    } catch (error) {
+        console.error('Error fetching semesters:', error);
+    }
+}
+
 populateTimeslots();
+fetchSemesters();
+
+document.getElementById("semester").addEventListener("change", function() {
+    const selectedSemester = this.value;
+    fetchSubjects(selectedSemester);
+});
 
 function generateCustomFormat() {
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

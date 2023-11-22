@@ -32,9 +32,12 @@
 
 <!-- Only For testing-->
 <!DOCTYPE html>
-<html>
-    <link rel="stylesheet" href="style\QRpageStyle.css" />
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style/QRpageStyle.css" />
     <title>QR Code Generator</title>
 </head>
 <body>
@@ -46,8 +49,11 @@
         <label for="timeslot">Timeslot:</label>
         <select id="timeslot" name="timeslot" required></select><br><br>
 
+        <label for="semester">Semester:</label>
+        <select id="semester" name="semester" required></select><br><br>
+
         <label for="subject">Subject:</label>
-        <input type="text" id="subject" name="subject" required><br><br>
+        <select id="subject" name="subject" required></select><br><br>
 
         <button type="button" id="generate-button">Generate QR Code</button><br><br>
 
@@ -59,9 +65,8 @@
         </div>
     </form>
 
-    <script src="script\qrcode.min.js"></script>
-    <script src="script\QRgenerator.js"></script>
+    <script src="script/qrcode.min.js"></script>
+    <script src="script/QRgenerator.js"></script>
 </body>
 </html>
-
 

@@ -303,45 +303,121 @@ app.post('/login', async (req, res) => {
   }
 });
 
-app.post('/markAttendance', async (req, res) => {
+// Handle attendance update
+app.post('/updateAttendance', async (req, res) => {
   try {
-    if (!req.body.image || !req.body.lat || !req.body.lon || !req.body.alt) {
-      res.status(400).json({ success: false, message: 'Invalid request. Please provide image data, latitude, longitude, and altitude.' });
-      return;
-    }
+      // Assuming you have a collection named 'AttendanceRecords'
+      const collection = client.db("Entities").collection("AttendanceRecords");
 
-    // Check if the request contains image data
-    const imageData = req.body.image;
+      // Insert attendance information into the collection
+      const result = await collection.insertOne(req.body);
 
-    // Check if the request contains location data
-    const lat = req.body.lat;
-    const lon = req.body.lon;
-    const alt = req.body.alt;
+      console.log('Attendance record inserted:', result.ops[0]);
 
-    // Perform facial recognition check
-    const isFacialRecognitionSuccessful = performFacialRecognition(imageData);
+      res.json({ success: true, message: 'Attendance record updated successfully' });
+  } catch (error) {
+      console.error('Error updating attendance:', error);
+      res.json({ success: false, message: 'Error updating attendance' });
+  }
+});
 
-    // Perform location tracking check
-    const isLocationTrackingSuccessful = isWithinCampus(lat, lon, alt) && !isTenMetersAway(lat, lon);
+// Fetch semesters
+app.get('/fetchSemesters', async (req, res) => {
+  try {
+      const collection = client.db("Entities").collection("Subject");
+      const semesters = await collection.distinct("semester");
+      res.json(semesters);
+  } catch (error) {
+      console.error('Error fetching semesters:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
-    // Check the results of both checks
-    if (isFacialRecognitionSuccessful && isLocationTrackingSuccessful) {
-      // Mark attendance in the database or perform any other necessary actions
-      res.json({ success: true, message: 'Attendance marked successfully' });
-    } else if (!isFacialRecognitionSuccessful && !isLocationTrackingSuccessful) {
-      res.status(400).json({ success: false, message: 'Attendance not marked. Facial recognition and location tracking both failed.' });
-    } else if (!isFacialRecognitionSuccessful) {
-      res.status(400).json({ success: false, message: 'Attendance not marked. Facial recognition failed.' });
-    } else if (!isLocationTrackingSuccessful) {
-      res.status(400).json({ success: false, message: 'Attendance not marked. Location tracking failed.' });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Internal server error occurred' });
+// Fetch subjects based on semester
+app.get('/fetchSubjects', async (req, res) => {
+  try {
+      const semester = req.query.semester;
+      const collection = client.db("Entities").collection("Subject");
+      const subjects = await collection.distinct("subjects", { semester: semester });
+      res.json(subjects);
+  } catch (error) {
+      console.error('Error fetching subjects:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
 app.listen(5500, () => console.log('Server Started!'));
+
+// Dummy attendance record collection name (replace it with your actual collection name)
+// const attendanceCollection = client.db("Entities").collection("AttendanceRecords");
+
+// app.post('/updateAttendance', async (req, res) => {
+//   try {
+//     const { userId, userType, subject, status } = req.body;
+
+//     // Insert the attendance record into the database
+//     const result = await attendanceCollection.insertOne({
+//       userId,
+//       userType,
+//       subject,
+//       status,
+//       timestamp: new Date(),
+//     });
+
+//     if (result.insertedCount > 0) {
+//       console.log('Attendance record inserted successfully');
+//       res.json({ success: true, message: 'Attendance record updated successfully' });
+//     } else {
+//       console.log('Failed to insert attendance record');
+//       res.json({ success: false, message: 'Failed to update attendance record' });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.json({ success: false, message: 'Error occurred' });
+//   }
+// });
+
+
+
+// app.post('/markAttendance', async (req, res) => {
+//   try {
+//     if (!req.body.image || !req.body.lat || !req.body.lon || !req.body.alt) {
+//       res.status(400).json({ success: false, message: 'Invalid request. Please provide image data, latitude, longitude, and altitude.' });
+//       return;
+//     }
+
+//     // Check if the request contains image data
+//     const imageData = req.body.image;
+
+//     // Check if the request contains location data
+//     const lat = req.body.lat;
+//     const lon = req.body.lon;
+//     const alt = req.body.alt;
+
+//     // Perform facial recognition check
+//     const isFacialRecognitionSuccessful = performFacialRecognition(imageData);
+
+//     // Perform location tracking check
+//     const isLocationTrackingSuccessful = isWithinCampus(lat, lon, alt) && !isTenMetersAway(lat, lon);
+
+//     // Check the results of both checks
+//     if (isFacialRecognitionSuccessful && isLocationTrackingSuccessful) {
+//       // Mark attendance in the database or perform any other necessary actions
+//       res.json({ success: true, message: 'Attendance marked successfully' });
+//     } else if (!isFacialRecognitionSuccessful && !isLocationTrackingSuccessful) {
+//       res.status(400).json({ success: false, message: 'Attendance not marked. Facial recognition and location tracking both failed.' });
+//     } else if (!isFacialRecognitionSuccessful) {
+//       res.status(400).json({ success: false, message: 'Attendance not marked. Facial recognition failed.' });
+//     } else if (!isLocationTrackingSuccessful) {
+//       res.status(400).json({ success: false, message: 'Attendance not marked. Location tracking failed.' });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, message: 'Internal server error occurred' });
+//   }
+// });
+
+
 
 // // Load a pre-trained face recognition model
 // async function loadFaceRecognitionModel() {
