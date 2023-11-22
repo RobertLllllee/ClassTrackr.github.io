@@ -116,7 +116,7 @@ function generateQRCode() {
     console.log("Instructor:",instructor);
     console.log("Custom Format:", customFormat);
 
-        // Save the generated code and details to localStorage
+// Save the generated code and details to localStorage
     const details = {
         date,
         timeslot,
