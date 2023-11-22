@@ -345,7 +345,23 @@ app.get('/fetchSubjects', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+app.post('/getTimetable', async (req, res) => {
+  try {
+      await client.connect();
+      const database = client.db('Entities');
+      const collection = database.collection('Timetable');
+      const courseCode = req.body.courseCode;
 
+      const timetable = await collection.find({ course_code: courseCode }).toArray();
+
+      res.json(timetable);
+  } catch (err) {
+      console.error(err);
+      res.status(500).send("Error retrieving timetable");
+  } finally {
+      await client.close();
+  }
+});
 app.listen(5500, () => console.log('Server Started!'));
 
 // Dummy attendance record collection name (replace it with your actual collection name)
