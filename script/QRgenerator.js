@@ -102,6 +102,9 @@ function generateQRCode() {
     const timeslot = document.getElementById("timeslot").value;
     const subject = document.getElementById("subject").value;
 
+    // Retrieve the instructor's name from localStorage or session variable
+    const instructor = localStorage.getItem("instructorName") || "DefaultInstructor";
+
     const customFormat = generateCustomFormat();
     const qrText = `${date} - ${timeslot} - ${subject} - ${customFormat}`;
 
@@ -110,7 +113,18 @@ function generateQRCode() {
     console.log("Date:", date);
     console.log("Timeslot:", timeslot);
     console.log("Subject:", subject);
+    console.log("Instructor:",instructor);
     console.log("Custom Format:", customFormat);
+
+        // Save the generated code and details to localStorage
+    const details = {
+        date,
+        timeslot,
+        subject,
+        instructor,
+        customFormat
+        };
+        localStorage.setItem("generatedDetails", JSON.stringify(details));
 
     // Clear previous data
     qrContainer.innerHTML = '';

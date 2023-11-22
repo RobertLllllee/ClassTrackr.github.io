@@ -13,6 +13,9 @@ window.onload = function() {
         document.getElementById('userType').textContent = userType;
         document.getElementById('userID').textContent = userId;
         document.getElementById('userName').textContent = userName; // Display userName
+
+         // Store the instructor's name in localStorage
+         localStorage.setItem('instructorName', userName);
       }
     }
   };

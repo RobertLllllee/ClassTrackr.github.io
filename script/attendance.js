@@ -136,6 +136,7 @@ window.onload = function () {
       document.getElementById('date').textContent = details.date;
       document.getElementById('timeslot').textContent = details.timeslot;
       document.getElementById('subject').textContent = details.subject;
+      document.getElementById('instructorName').textContent = details.instructor;
   }
 };
 
