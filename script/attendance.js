@@ -1,9 +1,8 @@
-console.log('attendance.js loaded');
+console.log("Attendance.js loaded!");
 
-// Move the getLabeledFaceDescriptions function here
 async function getLabeledFaceDescriptions() {
   try {
-    const labels = ["JunHong" || "YongJun" || "ShiJie"];
+    const labels = ["Lee Jun Hong" || "YongJun" || "ShiJie"];
     return await Promise.all(
       labels.map(async (label) => {
         const descriptions = [];
@@ -25,120 +24,319 @@ async function getLabeledFaceDescriptions() {
 }
 
 window.onload = function () {
-  let recognitionSuccessful = false; // Flag to track if recognition is successful
+  let recognitionSuccessful = false;
+// Fetch user information when the page loads
+fetchUserInfo();
 
-  // Fetch user information when the page loads
-  fetchUserInfo();
+// Retrieve the generated details from localStorage
+const detailsString = localStorage.getItem("generatedDetails");
+let details;
 
-  // Function to fetch and display the user information
-  function fetchUserInfo() {
-    const userId = sessionStorage.getItem('userId'); // Retrieve the appropriate user ID
-    const userName = sessionStorage.getItem('userName'); // Retrieve the appropriate user name
+if (detailsString) {
+  details = JSON.parse(detailsString);
 
-    if (userId) {
-      // Update the dashboard with UserType, UserID, and UserName
-      document.getElementById('userID').textContent = userId;
-      document.getElementById('userName').textContent = userName; // Display userName
-    }
+  // Display the details in the HTML
+  document.getElementById('date').textContent = details.date;
+  document.getElementById('timeslot').textContent = details.timeslot;
+  document.getElementById('subject').textContent = details.subject;
+  document.getElementById('instructorName').textContent = details.instructor;
+}
+
+// Function to fetch and display the user information
+function fetchUserInfo() {
+  const userId = sessionStorage.getItem('userId'); // Retrieve the appropriate user ID
+  const userName = sessionStorage.getItem('userName'); // Retrieve the appropriate user name
+
+  if (userId) {
+    // Update the dashboard with UserType, UserID, and UserName
+    document.getElementById('userID').textContent = userId;
+    document.getElementById('userName').textContent = userName; // Display userName
   }
+}
 
-  function startFacialRecognition() {
-    Promise.all([
-      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
-      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
-      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-    ])
-      .then(startWebcam)
-      .catch((error) => {
-        console.error('Error loading face recognition models:', error);
-      });
-
-    function startWebcam() {
-      navigator.mediaDevices
-        .getUserMedia({
-          video: true,
-          audio: false,
-        })
-        .then((stream) => {
-          video.srcObject = stream;
-        })
-        .catch((error) => {
-          console.error('Error accessing camera:', error);
-        });
-    }
-
-    video.addEventListener("play", async () => {
-      try {
-        const labeledFaceDescriptors = await getLabeledFaceDescriptions();
-        const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
-
-        const canvas = faceapi.createCanvasFromMedia(video);
-        document.body.append(canvas);
-
-        const displaySize = { width: video.width, height: video.height };
-        faceapi.matchDimensions(canvas, displaySize);
-
-        setInterval(async () => {
-          try {
-            const detections = await faceapi
-              .detectAllFaces(video)
-              .withFaceLandmarks()
-              .withFaceDescriptors();
-
-            const resizedDetections = faceapi.resizeResults(detections, displaySize);
-
-            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-
-            const results = resizedDetections.map((d) => {
-              return faceMatcher.findBestMatch(d.descriptor);
-            });
-
-            results.forEach((result, i) => {
-              const box = resizedDetections[i].detection.box;
-              const drawBox = new faceapi.draw.DrawBox(box, {
-                label: result,
-              });
-              drawBox.draw(canvas);
-
-              // Display a message when a face is recognized
-              console.log('Recognized:', result.label);
-              recognitionSuccessful = true; // Set the flag to true
-            });
-          } catch (error) {
-            console.error('Error during facial recognition:', error);
-          }
-        }, 100);
-      } catch (error) {
-        console.error('Error setting up facial recognition:', error);
-      }
+// Function to mark attendance in the collection
+async function markAttendance(studentName, studentId, date, timeslot, subject, instructorName) {
+  try {
+    const collection = client.db("Entities").collection("AttendanceRecords");
+    const result = await collection.insertOne({
+      studentName: studentName,
+      studentId: studentId,
+      date: date,
+      timeslot: timeslot,
+      subject: subject,
+      instructorName: instructorName,
     });
 
-    // Display a success message for passing both location and recognition
-    if (recognitionSuccessful) {
-      document.getElementById('resultMessage').innerHTML = 'Attendance taken and recognized successfully!';
-    }
+    console.log('Attendance record inserted:', result.ops[0]);
+  } catch (error) {
+    console.error('Error marking attendance:', error);
+  }
+}
+
+// Function to start facial recognition
+function startFacialRecognition() {
+  Promise.all([
+    faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+    faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+    faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+  ])
+    .then(startWebcam)
+    .catch((error) => {
+      console.error('Error loading face recognition models:', error);
+    });
+
+  function startWebcam() {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: true,
+        audio: false,
+      })
+      .then((stream) => {
+        video.srcObject = stream;
+      })
+      .catch((error) => {
+        console.error('Error accessing camera:', error);
+      });
   }
 
-  // Call getLocation with a callback to trigger facial recognition if successful
-  getLocation(function (success) {
-    if (success) {
-      // Start facial recognition
-      startFacialRecognition();
+  video.addEventListener("play", async () => {
+    try {
+      const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+      const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+
+      const canvas = faceapi.createCanvasFromMedia(video);
+      document.body.append(canvas);
+
+      const displaySize = { width: video.width, height: video.height };
+      faceapi.matchDimensions(canvas, displaySize);
+
+      setInterval(async () => {
+        try {
+          const detections = await faceapi
+            .detectAllFaces(video)
+            .withFaceLandmarks()
+            .withFaceDescriptors();
+
+          const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+          canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+          const results = resizedDetections.map((d) => {
+            return faceMatcher.findBestMatch(d.descriptor);
+          });
+
+          results.forEach(async (result, i) => {
+            const box = resizedDetections[i].detection.box;
+            const drawBox = new faceapi.draw.DrawBox(box, {
+              label: result,
+            });
+            drawBox.draw(canvas);
+
+            // Display a message when a face is recognized
+            console.log('Recognized:', result.label);
+            recognitionSuccessful = true; // Set the flag to true
+
+            // Mark attendance in the collection if recognition is successful
+            if (recognitionSuccessful) {
+              markAttendance(result.label, userId, details.date, details.timeslot, details.subject, details.instructor);
+              recognitionSuccessful = false; // Reset the flag
+            }
+          });
+        } catch (error) {
+          console.error('Error during facial recognition:', error);
+        }
+      }, 100);
+    } catch (error) {
+      console.error('Error setting up facial recognition:', error);
     }
   });
+}
 
-  // Retrieve the generated details from localStorage
-  const detailsString = localStorage.getItem("generatedDetails");
-  if (detailsString) {
-      const details = JSON.parse(detailsString);
-
-      // Display the details in the HTML
-      document.getElementById('date').textContent = details.date;
-      document.getElementById('timeslot').textContent = details.timeslot;
-      document.getElementById('subject').textContent = details.subject;
-      document.getElementById('instructorName').textContent = details.instructor;
+// Call getLocation with a callback to trigger facial recognition if successful
+getLocation(function (success) {
+  if (success) {
+    // Start facial recognition
+    startFacialRecognition();
   }
+});
 };
+// console.log('attendance.js loaded');
+
+// // Move the getLabeledFaceDescriptions function here
+// async function getLabeledFaceDescriptions() {
+//   try {
+//     const labels = ["JunHong" || "YongJun" || "ShiJie"];
+//     return await Promise.all(
+//       labels.map(async (label) => {
+//         const descriptions = [];
+//         for (let i = 1; i <= 3; i++) {
+//           const img = await faceapi.fetchImage(`./labels/${label}/${i}.jpg`);
+//           const detections = await faceapi
+//             .detectSingleFace(img)
+//             .withFaceLandmarks()
+//             .withFaceDescriptor();
+//           descriptions.push(detections.descriptor);
+//         }
+//         return new faceapi.LabeledFaceDescriptors(label, descriptions);
+//       })
+//     );
+//   } catch (error) {
+//     console.error('Error getting labeled face descriptions:', error);
+//     return [];
+//   }
+// }
+
+// // Function to fetch student ID based on the student name
+// async function fetchStudentId(studentName) {
+//   try {
+//     const response = await fetch(`http://localhost:5500/fetchStudentId?studentName=${studentName}`);
+//     const data = await response.json();
+
+//     if (data.success) {
+//       return data.studentId;
+//     } else {
+//       console.error('Error fetching student ID:', data.message);
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error('Error fetching student ID:', error);
+//     return null;
+//   }
+// }
+
+// window.onload = function () {
+//   let recognitionSuccessful = false;
+
+//   fetchUserInfo();
+
+//   function fetchUserInfo() {
+//     const userId = sessionStorage.getItem('userId');
+//     const userName = sessionStorage.getItem('userName');
+
+//     if (userId) {
+//       document.getElementById('userID').textContent = userId;
+//       document.getElementById('userName').textContent = userName;
+//     }
+//   }
+
+//   async function startFacialRecognition() {
+//     try {
+//       // Load all required models
+//       await Promise.all([
+//         faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+//         faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+//         faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+//       ]);
+
+//       // Start the webcam
+//       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+//       video.srcObject = stream;
+
+//       video.addEventListener("play", async () => {
+//         try {
+//           const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+//           const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors);
+
+//           const canvas = faceapi.createCanvasFromMedia(video);
+//           document.body.append(canvas);
+
+//           const displaySize = { width: video.width, height: video.height };
+//           faceapi.matchDimensions(canvas, displaySize);
+
+//           setInterval(async () => {
+//             try {
+//               const detections = await faceapi
+//                 .detectAllFaces(video)
+//                 .withFaceLandmarks()
+//                 .withFaceDescriptors();
+
+//               const resizedDetections = faceapi.resizeResults(detections, displaySize);
+
+//               canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+//               const detailsString = localStorage.getItem("generatedDetails");
+//               if (!detailsString) {
+//                 console.error('Generated details not found');
+//                 return;
+//               }
+
+//               const details = JSON.parse(detailsString);
+
+//               const results = resizedDetections.map((d) => {
+//                 return faceMatcher.findBestMatch(d.descriptor);
+//               });
+
+//               results.forEach(async (result, i) => {
+//                 const box = resizedDetections[i].detection.box;
+//                 const drawBox = new faceapi.draw.DrawBox(box, {
+//                   label: result,
+//                 });
+//                 drawBox.draw(canvas);
+
+//                 console.log('Recognized:', result.label);
+//                 recognitionSuccessful = true;
+
+//                 if (recognitionSuccessful) {
+//                   const studentId = await fetchStudentId(result.label);
+
+//                   const attendanceData = {
+//                     studentName: result.label,
+//                     studentId: studentId,
+//                     date: details.date,
+//                     timeslot: details.timeslot,
+//                     subject: details.subject,
+//                     instructorName: details.instructor,
+//                   };
+
+//                   try {
+//                     const response = await fetch('http://localhost:5500/updateAttendance', {
+//                       method: 'POST',
+//                       headers: {
+//                         'Content-Type': 'application/json',
+//                       },
+//                       body: JSON.stringify(attendanceData),
+//                     });
+
+//                     const data = await response.json();
+
+//                     if (data.success) {
+//                       console.log('Attendance record updated successfully');
+//                     } else {
+//                       console.error('Error updating attendance:', data.message);
+//                     }
+//                   } catch (error) {
+//                     console.error('Error updating attendance:', error);
+//                   }
+//                 }
+//               });
+//             } catch (error) {
+//               console.error('Error during facial recognition:', error);
+//             }
+//           }, 100);
+//         } catch (error) {
+//           console.error('Error setting up facial recognition:', error);
+//         }
+//       });
+//     } catch (error) {
+//       console.error('Error loading face recognition models:', error);
+//     }
+//   }
+
+//   getLocation(function (success) {
+//     if (success) {
+//       startFacialRecognition();
+//     }
+//   });
+
+//   const detailsString = localStorage.getItem("generatedDetails");
+//   if (detailsString) {
+//     const details = JSON.parse(detailsString);
+//     document.getElementById('date').textContent = details.date;
+//     document.getElementById('timeslot').textContent = details.timeslot;
+//     document.getElementById('subject').textContent = details.subject;
+//     document.getElementById('instructorName').textContent = details.instructor;
+//   }
+// };
 
 // console.log('attendance.js loaded');
 // window.onload = function() {

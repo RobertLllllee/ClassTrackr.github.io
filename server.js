@@ -303,23 +303,23 @@ app.post('/login', async (req, res) => {
   }
 });
 
-// Handle attendance update
-app.post('/updateAttendance', async (req, res) => {
-  try {
-      // Assuming you have a collection named 'AttendanceRecords'
-      const collection = client.db("Entities").collection("AttendanceRecords");
+// // Handle attendance update
+// app.post('/updateAttendance', async (req, res) => {
+//   try {
+//       // Assuming you have a collection named 'AttendanceRecords'
+//       const collection = client.db("Entities").collection("AttendanceRecords");
 
-      // Insert attendance information into the collection
-      const result = await collection.insertOne(req.body);
+//       // Insert attendance information into the collection
+//       const result = await collection.insertOne(req.body);
 
-      console.log('Attendance record inserted:', result.ops[0]);
+//       console.log('Attendance record inserted:', result.ops[0]);
 
-      res.json({ success: true, message: 'Attendance record updated successfully' });
-  } catch (error) {
-      console.error('Error updating attendance:', error);
-      res.json({ success: false, message: 'Error updating attendance' });
-  }
-});
+//       res.json({ success: true, message: 'Attendance record updated successfully' });
+//   } catch (error) {
+//       console.error('Error updating attendance:', error);
+//       res.json({ success: false, message: 'Error updating attendance' });
+//   }
+// });
 
 // Fetch semesters
 app.get('/fetchSemesters', async (req, res) => {
@@ -343,6 +343,67 @@ app.get('/fetchSubjects', async (req, res) => {
   } catch (error) {
       console.error('Error fetching subjects:', error);
       res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/updateAttendance', async (req, res) => {
+  try {
+    const collection = client.db("Entities").collection("AttendanceRecords");
+
+    // Check if req.body exists and has necessary properties
+    if (!req.body || !req.body.studentName || !req.body.studentId || !req.body.date || !req.body.timeslot || !req.body.subject || !req.body.instructorName) {
+      console.error('Invalid attendance data received:', req.body);
+      res.json({ success: false, message: 'Invalid attendance data' });
+      return;
+    }
+
+    const result = await collection.insertOne(req.body);
+
+    console.log('Attendance record inserted:', result.ops[0]); // Add this line
+
+    res.json({ success: true, message: 'Attendance record updated successfully' });
+  } catch (error) {
+    console.error('Error updating attendance:', error);
+    res.json({ success: false, message: 'Error updating attendance' });
+  }
+});
+
+app.get('/fetchStudentDetails', async (req, res) => {
+  try {
+    const studentId = req.query.studentId;
+    const collection = client.db("Entities").collection("Student");
+    const student = await collection.findOne({ StudentID: studentId });
+
+    if (student) {
+      res.json({
+        success: true,
+        studentId: student.StudentID,
+        studentEmail: student.StudentEmail,
+        // Add more fields as needed
+      });
+    } else {
+      res.json({ success: false, message: 'Student not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching student details:', error);
+    res.json({ success: false, message: 'Error fetching student details' });
+  }
+});
+
+app.get('/fetchStudentId', async (req, res) => {
+  try {
+    const studentName = req.query.studentName;
+    const collection = client.db("Entities").collection("Student");
+    const student = await collection.findOne({ StudentName: studentName });
+
+    if (student) {
+      res.json({ success: true, studentId: student.StudentID });
+    } else {
+      res.json({ success: false, message: 'Student not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching student ID:', error);
+    res.json({ success: false, message: 'Error fetching student ID' });
   }
 });
 
