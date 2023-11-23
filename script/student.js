@@ -76,11 +76,51 @@ window.onload = function() {
             document.getElementById('userID').textContent = userId;
             document.getElementById('userName').textContent = userName;
         }
+        fetchAttendanceDetails();
     }
-    
+    function fetchAttendanceDetails() {
+        const studentID = sessionStorage.getItem('userId');
+
+        fetch('http://localhost:5500/getAttendanceDetails', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ StudentID: studentID }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateAttendanceDetails(data.attendanceDetails);
+            } else {
+                console.log('Attendance details not found:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching attendance details:', error);
+        });
+    }
+
+    function updateAttendanceDetails(details) {
+        document.getElementById('totalClasses').textContent = details.TotalClasses;
+        document.getElementById('attendedClasses').textContent = details.AttendedClasses;
+        document.getElementById('attendanceRate').textContent = details.AttendancePercentage.toFixed(2) + '%';
+    }
 };
     // JavaScript function to redirect to QR.html
     function redirecttocodeinsert() {
     // Change window.location to the path of your QR.html file
     window.location.href = 'attendancecode.html';
 }
+
+function updateCurrentTime() {
+    const now = new Date();
+    const formattedTime = now.toLocaleTimeString();
+    document.getElementById('currentTime').textContent = formattedTime;
+  }
+  
+  // Update time every second
+  setInterval(updateCurrentTime, 1000);
+  
+  // Set initial time
+  updateCurrentTime();

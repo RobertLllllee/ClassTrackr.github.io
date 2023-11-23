@@ -8,7 +8,10 @@ body {
     align-items: center;
     min-height: 100vh;
 }
-
+h1 {
+    color: #3581B8; /* Blue color */
+    text-align: center;
+}
 .container {
     width: 450px;
     margin: 0 auto;
