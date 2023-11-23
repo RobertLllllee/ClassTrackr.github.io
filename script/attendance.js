@@ -201,7 +201,7 @@
 // });
 console.log("Attendance.js loaded!");
 
-let recognitionSuccessful = false; // Flag to track whether recognition has occurred
+let recognitionSuccessful = true; // Flag to track whether recognition has occurred
 
 // Fetch user information when the page loads
 fetchUserInfo();
@@ -378,6 +378,7 @@ function startFacialRecognition() {
 
             // Mark attendance only if recognition is successful and it hasn't been marked before
             if (recognitionSuccessful) {
+              console.log('Marking attendance...');
               markAttendance(details.date, details.timeslot, details.subject, details.instructor);
               recognitionSuccessful = false; // Reset the flag
             }
