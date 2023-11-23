@@ -147,11 +147,10 @@ function generateQRCode() {
     // Save the generated code to localStorage
     localStorage.setItem("generatedCode", customFormat);
 
-    // Redirect if the QR code is scanned
-    qrContainer.addEventListener("click", function() {
-        // Fetch and display attendance when QR code is clicked
-        fetchAndDisplayAttendance(customFormat);
-    });
+  // Redirect if the QR code is scanned
+  qrContainer.addEventListener("click", function() {
+    window.location.href = "attendance.html";
+});
 
     const expirationTime = new Date().getTime() + 5 * 60 * 1000; // 5 minutes in milliseconds
 
@@ -169,6 +168,10 @@ function generateQRCode() {
             countdownContainer.innerHTML = `Expires in ${minutes}m ${seconds}s`;
         }
     }, 1000);
+
+    // Fetch and display attendance for the generated code
+    fetchAndDisplayAttendance(customFormat);
+
 }
 
 document.getElementById("generate-button").addEventListener("click", generateQRCode);

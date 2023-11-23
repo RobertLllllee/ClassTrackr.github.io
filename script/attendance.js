@@ -383,6 +383,10 @@ function startFacialRecognition() {
             if (recognitionSuccessful) {
               console.log('Marking attendance...');
               markAttendance(details.date, details.timeslot, details.subject, details.instructor);
+
+               // Add this line to fetch and display attendance
+              fetchAndDisplayAttendance(details.customFormat);
+
               recognitionSuccessful = false; // Reset the flag
             }
           });
@@ -405,3 +409,42 @@ startFacialRecognition();
 //     startFacialRecognition();
 //   }
 // });
+
+// Function to fetch and display attendance for a specific customFormat
+async function fetchAndDisplayAttendance(customFormat) {
+  try {
+      // Log to the console for debugging
+      console.log('Fetching attendance for customFormat:', customFormat);
+
+      // Fetch attendance data for the given customFormat
+      const response = await fetch(`http://localhost:5500/fetchAttendance?customFormat=${customFormat}`);
+      const data = await response.json();
+
+      if (data.success) {
+          // Display the attendance list
+          displayAttendanceList(data.attendanceList);
+      } else {
+          console.error('Error fetching attendance:', data.message);
+      }
+  } catch (error) {
+      console.error('Error fetching attendance:', error);
+  }
+}
+
+// Function to display the attendance list
+function displayAttendanceList(attendanceList) {
+  const attendanceListContainer = document.getElementById('attendance-list');
+
+  // Clear previous data
+  attendanceListContainer.innerHTML = '';
+
+  // Create a list and add it to the container
+  const ul = document.createElement('ul');
+  attendanceList.forEach((attendance) => {
+      const li = document.createElement('li');
+      li.textContent = `${attendance.studentName} - ${attendance.studentId}`;
+      ul.appendChild(li);
+  });
+
+  attendanceListContainer.appendChild(ul);
+}
