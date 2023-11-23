@@ -165,17 +165,6 @@ button {
     border-radius: 4px;
     cursor: pointer;
 }
-/* Footer Styles */
-.footer {
-    text-align: center;
-    padding: 10px 0;
-    color: #333; /* Change the text color as needed */
-}
-
-.footer p {
-    margin: 0; /* Removes default margin */
-    padding: 4px; /* Adds some padding for spacing */
-}
 
 /* Header styles */
 .main-header {
@@ -256,14 +245,7 @@ button {
   .sidebar {
       padding-top: 0; /* Remove padding at the top of the sidebar */
   }
-  /* Existing sidebar link styles */
-  .sidebar a {
-    padding: 10px 15px;
-    text-decoration: none;
-    font-size: 18px;
-    color: #ddd;
-    display: block;
-  }
+  
   
   /* New style to add spacing to the icons */
   .sidebar a i {
