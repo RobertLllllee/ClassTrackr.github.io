@@ -274,43 +274,46 @@ async function fetchStudentId(studentName) {
   }
 }
 
-// Function to mark attendance
-async function markAttendance(date, timeslot, subject, instructorName) {
+async function markAttendance(date, timeslot, subject, instructorName, customFormat) {
   try {
-    // Fetch user details from session
-    const userId = sessionStorage.getItem('userId');
-    const userName = sessionStorage.getItem('userName');
+      // Fetch user details from session
+      const userId = sessionStorage.getItem('userId');
+      const userName = sessionStorage.getItem('userName');
 
-    if (!userId || !userName) {
-      console.error('User details not found');
-      return;
-    }
+      if (!userId || !userName) {
+          console.error('User details not found');
+          return;
+      }
 
-    // Use fetch to send attendance data to the server
-    const response = await fetch('http://localhost:5500/updateAttendance', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        StudentName: userName,
-        studentId: userId,
-        date: date,
-        timeslot: timeslot,
-        subject: subject,
-        instructorName: instructorName,
-      }),
-    });
+      // Use fetch to send attendance data to the server
+      const response = await fetch('http://localhost:5500/updateAttendance', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              StudentName: userName,
+              studentId: userId,
+              date: date,
+              timeslot: timeslot,
+              subject: subject,
+              instructorName: instructorName,
+              customFormat: customFormat, // Include custom code in attendance data
+          }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (data.success) {
-      console.log('Attendance record updated successfully');
-    } else {
-      console.error('Error updating attendance:', data.message);
-    }
+      if (data.success) {
+          console.log('Attendance record updated successfully');
+
+          // Redirect to the dashboard
+          window.location.href = 'student.html';
+      } else {
+          console.error('Error updating attendance:', data.message);
+      }
   } catch (error) {
-    console.error('Error marking attendance:', error);
+      console.error('Error marking attendance:', error);
   }
 }
 
@@ -393,10 +396,12 @@ function startFacialRecognition() {
   });
 }
 
+startFacialRecognition();
+
 // Call getLocation with a callback to trigger facial recognition if successful
-getLocation(function (success) {
-  if (success) {
-    // Start facial recognition
-    startFacialRecognition();
-  }
-});
+// getLocation(function (success) {
+//   if (success) {
+//     // Start facial recognition
+//     startFacialRecognition();
+//   }
+// });

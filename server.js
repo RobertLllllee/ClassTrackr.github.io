@@ -432,6 +432,22 @@ app.post('/updateAttendance', async (req, res) => {
   }
 });
 
+// Fetch attendance data based on the custom code
+app.get('/fetchAttendance', async (req, res) => {
+  try {
+      const customFormat = req.query.customFormat;
+      const collection = client.db("Entities").collection("AttendanceRecords");
+
+      // Find unique student names who attended with the provided custom code
+      const attendance = await collection.distinct('StudentName', { customFormat: customFormat });
+
+      res.json({ success: true, attendance: attendance });
+  } catch (error) {
+      console.error('Error fetching attendance:', error);
+      res.json({ success: false, message: 'Error fetching attendance' });
+  }
+});
+
 app.listen(5500, () => console.log('Server Started!'));
 
 // app.get('/fetchStudentDetails', async (req, res) => {

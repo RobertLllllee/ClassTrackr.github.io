@@ -1,10 +1,11 @@
 console.log('QR code generator js is loaded');
+
 let qrContainer = document.getElementById("qrcode");
 let codeContainer = document.getElementById("code");
 let expiryMessage = document.getElementById("expiry-message");
 let countdownContainer = document.getElementById("countdown");
+let attendanceListContainer = document.getElementById("attendance-list");
 let countdownInterval;
-
 
 function populateTimeslots() {
     const timeslotSelect = document.getElementById("timeslot");
@@ -113,24 +114,25 @@ function generateQRCode() {
     console.log("Date:", date);
     console.log("Timeslot:", timeslot);
     console.log("Subject:", subject);
-    console.log("Instructor:",instructor);
+    console.log("Instructor:", instructor);
     console.log("Custom Format:", customFormat);
 
-// Save the generated code and details to localStorage
+    // Save the generated code and details to localStorage
     const details = {
         date,
         timeslot,
         subject,
         instructor,
         customFormat
-        };
-        localStorage.setItem("generatedDetails", JSON.stringify(details));
+    };
+    localStorage.setItem("generatedDetails", JSON.stringify(details));
 
     // Clear previous data
     qrContainer.innerHTML = '';
     codeContainer.innerHTML = '';
     expiryMessage.innerHTML = '';
     countdownContainer.innerHTML = '';
+    attendanceListContainer.innerHTML = '';
 
     // Create a new QR code using qrcode.js
     const qrcode = new QRCode(qrContainer, {
@@ -147,7 +149,8 @@ function generateQRCode() {
 
     // Redirect if the QR code is scanned
     qrContainer.addEventListener("click", function() {
-        window.location.href = "attendance.html";
+        // Fetch and display attendance when QR code is clicked
+        fetchAndDisplayAttendance(customFormat);
     });
 
     const expirationTime = new Date().getTime() + 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -169,6 +172,34 @@ function generateQRCode() {
 }
 
 document.getElementById("generate-button").addEventListener("click", generateQRCode);
+
+async function fetchAndDisplayAttendance(customFormat) {
+    console.log('Fetching attendance for customFormat:', customFormat);
+
+    try {
+        const response = await fetch(`http://localhost:5500/fetchAttendance?customFormat=${customFormat}`);
+        const data = await response.json();
+
+        if (data.success) {
+            const attendanceList = data.attendance;
+            console.log('Fetched attendance:', attendanceList);
+
+            // Display the attendance list
+            attendanceListContainer.innerHTML = '<h2>Attendance List</h2>';
+            const ul = document.createElement("ul");
+            attendanceList.forEach((entry) => {
+                const li = document.createElement("li");
+                li.textContent = `${entry.studentName} - ${entry.studentId}`;
+                ul.appendChild(li);
+            });
+            attendanceListContainer.appendChild(ul);
+        } else {
+            console.error('Error fetching attendance:', data.message);
+        }
+    } catch (error) {
+        console.error('Error fetching attendance:', error);
+    }
+}
 
 
 // //Final version
