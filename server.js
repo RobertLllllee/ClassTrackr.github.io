@@ -195,11 +195,9 @@
 // })();
 const express = require('express');
 const session = require('express-session');
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const MongoStore = require('connect-mongo');
 const app = express();
-// const multer = require('multer');
-// const path = require('path');
 const cors = require('cors');
 
 app.use(express.json());
@@ -223,19 +221,9 @@ async function connectToDatabase() {
 connectToDatabase();
 
 // Use a middleware to add the connected client to the request object
-app.use(async (req, res, next) => {
+app.use((req, res, next) => {
   try {
-    req.dbClient = await connectToDatabase();
-    next();
-  } catch (error) {
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-// Use a middleware to add the connected client to the request object
-app.use(async (req, res, next) => {
-  try {
-    req.dbClient = await connectToDatabase();
+    req.dbClient = client; // Pass the connected client directly
     next();
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
@@ -247,6 +235,19 @@ const mongoStore = MongoStore.create({
   dbName: 'Entities',
   collectionName: 'sessions',
 });
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    store: mongoStore,
+    cookie: {
+      secure: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
 
 app.use(
   session({
@@ -672,6 +673,29 @@ app.post('/updateModifiedAttendance', async (req, res) => {
   } catch (error) {
       console.error('Error updating attendance:', error);
       res.json({ success: false, message: 'Error updating attendance' });
+  }
+});
+
+app.post('/updateTotalClassAttended', async (req, res) => {
+  try {
+    const { studentId } = req.body;
+
+    const collection = req.dbClient.db("Entities").collection("Student");
+
+    // Increment TotalClassAttended by 1 for the specified studentId
+    const result = await collection.updateOne(
+      { StudentID: studentId },
+      { $inc: { TotalClassAttended: 1 } }
+    );
+
+    if (result.modifiedCount > 0) {
+      res.json({ success: true, message: 'TotalClassAttended updated successfully' });
+    } else {
+      res.json({ success: false, message: 'Student not found or TotalClassAttended not updated' });
+    }
+  } catch (error) {
+    console.error('Error updating TotalClassAttended:', error);
+    res.status(500).json({ success: false, message: 'Error updating TotalClassAttended' });
   }
 });
 

@@ -179,8 +179,19 @@ function saveModifiedStatus(studentId, selectedStatus) {
     .then(data => {
         if (data.success) {
             console.log('Attendance status updated successfully');
+
+            // Check if the status is 'Present' before updating TotalClassAttended
+            if (selectedStatus === 'Present') {
+                updateTotalClassAttended(studentId);
+            }
+
             // Refresh the attendance list after modification
-            // You may need to fetch the updated attendance list and call displayAttendanceList again
+            const generatedCode = localStorage.getItem("generatedCode");
+            if (generatedCode) {
+                fetchAttendanceList(generatedCode);
+            } else {
+                console.error("No QR code has been generated.");
+            }
         } else {
             console.error('Error updating attendance status:', data.message);
             // Handle the error, e.g., show an error message to the user
@@ -188,6 +199,32 @@ function saveModifiedStatus(studentId, selectedStatus) {
     })
     .catch(error => {
         console.error('Error updating attendance status:', error);
+        // Handle the error, e.g., show an error message to the user
+    });
+}
+
+function updateTotalClassAttended(studentId) {
+    console.log('Updating TotalClassAttended for student:', studentId);
+
+    // Call the backend endpoint to update TotalClassAttended in the Student collection
+    fetch('http://localhost:5500/updateTotalClassAttended', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ studentId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('TotalClassAttended updated successfully for student:', studentId);
+        } else {
+            console.error('Error updating TotalClassAttended:', data.message);
+            // Handle the error, e.g., show an error message to the user
+        }
+    })
+    .catch(error => {
+        console.error('Error updating TotalClassAttended:', error);
         // Handle the error, e.g., show an error message to the user
     });
 }
@@ -432,6 +469,42 @@ document.getElementById("refresh-button").addEventListener("click", function (ev
         console.error("No QR code has been generated.");
     };
 });
+
+// Function to update TotalClassAttended for students with 'Present' status in the Attendance collection
+async function updateStudentTotalClassAttended(attendanceList) {
+    try {
+        for (const attendance of attendanceList) {
+            const { studentId, status } = attendance;
+
+            // Check if the status is 'Present' before updating TotalClassAttended
+            if (status === 'Present') {
+                // Call the backend endpoint to update TotalClassAttended in the Student collection
+                const updateResponse = await fetch('http://localhost:5500/updateTotalClassAttended', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ studentId }),
+                });
+
+                const updateResult = await updateResponse.json();
+
+                if (updateResult.success) {
+                    console.log(`TotalClassAttended updated successfully for student: ${studentId}`);
+                } else {
+                    console.error(`Error updating TotalClassAttended for student ${studentId}:`, updateResult.message);
+                    // Handle the error, e.g., show an error message to the user
+                }
+            } else {
+                console.log(`Student ${studentId} was marked as ${status}, TotalClassAttended not updated.`);
+            }
+        }
+    } catch (error) {
+        console.error('Error updating TotalClassAttended:', error);
+        // Handle the error, e.g., show an error message to the user
+    }
+}
+
 document.getElementById("saveSubmitButton").addEventListener("click", async () => {
     // Prepare the data to be saved
     const date = document.getElementById("date").value;
@@ -442,12 +515,22 @@ document.getElementById("saveSubmitButton").addEventListener("click", async () =
 
     const studentsData = [];
 
-    // Iterate through the modifiedStatuses and prepare data for each student
-    for (const [studentId, status] of Object.entries(modifiedStatuses)) {
-        studentsData.push({
-            studentId,
-            status,
-        });
+    // Iterate through the attendanceList starting from the second row (skipping header)
+    const tableRows = document.querySelectorAll("#attendanceListContainer table tr");
+    for (let i = 1; i < tableRows.length; i++) {
+        const row = tableRows[i];
+        const idCell = row.cells[1]; // Assuming the second cell is the student ID cell
+        const statusCell = row.cells[row.cells.length - 2]; // Assuming the second-to-last cell is the status cell
+
+        if (idCell && statusCell) {
+            const studentId = idCell.textContent;
+            const status = modifiedStatuses[studentId] || statusCell.textContent || 'Present';
+
+            studentsData.push({
+                studentId,
+                status,
+            });
+        }
     }
 
     // Prepare the payload to be sent to the server
@@ -477,6 +560,9 @@ document.getElementById("saveSubmitButton").addEventListener("click", async () =
             modifiedStatuses = {};
             // Display a success message or take any other action as needed
             console.log("Data updated successfully");
+
+            // Update TotalClassAttended after submitting the attendance list
+            updateStudentTotalClassAttended(result.attendanceList);
         } else {
             console.error("Error updating data:", result.message);
             // Display an error message or take any other action as needed
@@ -486,6 +572,7 @@ document.getElementById("saveSubmitButton").addEventListener("click", async () =
         // Display an error message or take any other action as needed
     }
 });
+
 // //Final version
 // let qrContainer = document.getElementById("qrcode");
 // let codeContainer = document.getElementById("code");
