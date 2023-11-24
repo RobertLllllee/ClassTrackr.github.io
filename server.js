@@ -336,13 +336,20 @@ app.get('/fetchSemesters', async (req, res) => {
 
 app.get('/fetchSubjects', async (req, res) => {
   try {
-      const semester = req.query.semester;
-      const collection = client.db("Entities").collection("Subject");
-      const subjects = await collection.distinct("subjects", { semester: semester });
+    const semester = req.query.semester;
+    const collection = client.db("Entities").collection("Subject");
+    const subjectsData = await collection.findOne({ semester: parseInt(semester) });
+
+    if (subjectsData && subjectsData.subjects && subjectsData.subjects.length > 0) {
+      const subjects = subjectsData.subjects.map(subject => subject.name);
       res.json(subjects);
+    } else {
+      console.error('Subjects not found for the given semester:', semester);
+      res.status(404).json({ error: 'Subjects not found for the given semester' });
+    }
   } catch (error) {
-      console.error('Error fetching subjects:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+    console.error('Error fetching subjects:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
@@ -542,6 +549,129 @@ app.get('/fetchSubjectsBySemester', async (req, res) => {
   } catch (error) {
     console.error('Error fetching subjects by semester:', error);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+app.post('/modifyAttendanceStatus', async (req, res) => {
+  try {
+      const collection = client.db("Entities").collection("AttendanceRecords");
+
+      // Retrieve studentId and status from the request body
+      const { studentId, status } = req.body;
+
+      // Update the attendance record with the new status
+      const result = await collection.updateOne({ studentId }, { $set: { status } });
+
+      if (result && result.modifiedCount > 0) {
+          console.log(`Attendance status updated for student ${studentId} to ${status}`);
+          res.json({ success: true, message: 'Attendance status updated successfully' });
+      } else {
+          console.error('Error updating attendance status. Result:', result);
+          res.json({ success: false, message: 'Error updating attendance status' });
+      }
+  } catch (error) {
+      console.error('Error updating attendance status:', error);
+      res.json({ success: false, message: 'Error updating attendance status' });
+  }
+});
+
+app.post('/saveAttendanceList', async (req, res) => {
+  try {
+      const attendanceList = req.body;
+
+      // Create a new collection or use an existing one for storing attendance
+      const collection = client.db("Entities").collection("Attendance");
+
+      // Insert the attendance list into the collection
+      const result = await collection.insertMany(attendanceList);
+
+      if (result && result.ops && result.ops.length > 0) {
+          console.log('Attendance list saved:', result.ops);
+          res.json({ success: true, message: 'Attendance list saved successfully' });
+      } else {
+          console.error('Error saving attendance list. Result:', result);
+          res.json({ success: false, message: 'Error saving attendance list' });
+      }
+  } catch (error) {
+      console.error('Error saving attendance list:', error);
+      res.json({ success: false, message: 'Error saving attendance list' });
+  }
+});
+
+// Add this endpoint to handle the modification of attendance status
+app.post('/modifyAttendanceStatus', async (req, res) => {
+  try {
+      const collection = req.dbClient.db("Entities").collection("AttendanceRecords");
+
+      // Retrieve studentId and status from the request body
+      const { studentId, status } = req.body;
+
+      // Update the attendance record with the new status
+      const result = await collection.updateOne({ studentId }, { $set: { status } });
+
+      if (result && result.modifiedCount > 0) {
+          console.log(`Attendance status updated for student ${studentId} to ${status}`);
+          res.json({ success: true, message: 'Attendance status updated successfully' });
+      } else {
+          console.error('Error updating attendance status. Result:', result);
+          res.json({ success: false, message: 'Error updating attendance status' });
+      }
+  } catch (error) {
+      console.error('Error updating attendance status:', error);
+      res.json({ success: false, message: 'Error updating attendance status' });
+  }
+});
+
+app.post('/updateModifiedAttendance', async (req, res) => {
+  try {
+      const { date, timeslot, semester, subject, instructorName, studentsData } = req.body;
+
+      // Your logic to update the Attendance collection with modified statuses
+      // This will depend on your database schema and how you store attendance data
+
+      // For demonstration purposes, let's assume you have an Attendance collection
+      // with fields: date, timeslot, semester, subject, instructorName, students
+
+      const collection = client.db("Entities").collection("Attendance");
+
+      // Check if the record already exists for the specified date and timeslot
+      const existingRecord = await collection.findOne({
+          date,
+          timeslot,
+      });
+
+      if (existingRecord) {
+          // Update the existing record
+          await collection.updateOne(
+              {
+                  date,
+                  timeslot,
+              },
+              {
+                  $set: {
+                      semester,
+                      subject,
+                      instructorName,
+                      students: studentsData, // Assuming studentsData is an array of student objects
+                  },
+              }
+          );
+      } else {
+          // Insert a new record
+          await collection.insertOne({
+              date,
+              timeslot,
+              semester,
+              subject,
+              instructorName,
+              students: studentsData, // Assuming studentsData is an array of student objects
+          });
+      }
+
+      res.json({ success: true, message: 'Attendance updated successfully' });
+  } catch (error) {
+      console.error('Error updating attendance:', error);
+      res.json({ success: false, message: 'Error updating attendance' });
   }
 });
 

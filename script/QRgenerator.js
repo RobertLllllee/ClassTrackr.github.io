@@ -79,8 +79,14 @@ async function fetchSemesters() {
     }
 }
 
+// Ensure to call fetchSemesters to initialize the semesters dropdown
+fetchSemesters();
+
 populateTimeslots();
 fetchSemesters();
+
+// Variable to store modified statuses
+let modifiedStatuses = {};
 
 document.getElementById("semester").addEventListener("change", function() {
     const selectedSemester = this.value;
@@ -119,6 +125,67 @@ function fetchAttendanceList(customFormat) {
     }
 }
 
+function modifyAttendanceStatus(studentId, currentStatus) {
+    const newStatus = prompt("Modify attendance status (Absent, Present, Leave):", currentStatus);
+
+    if (newStatus !== null) {
+        // Call the backend endpoint to update the attendance status
+        fetch('http://localhost:5500/modifyAttendanceStatus', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ studentId, status: newStatus }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Attendance status updated successfully');
+                // Refresh the attendance list after modification
+                const generatedCode = localStorage.getItem("generatedCode");
+                if (generatedCode) {
+                    fetchAttendanceList(generatedCode);
+                } else {
+                    console.error("No QR code has been generated.");
+                }
+            } else {
+                console.error('Error updating attendance status:', data.message);
+                // Handle the error, e.g., show an error message to the user
+            }
+        })
+        .catch(error => {
+            console.error('Error updating attendance status:', error);
+            // Handle the error, e.g., show an error message to the user
+        });
+    }
+}
+
+function saveModifiedStatus(studentId, selectedStatus) {
+    // Call the backend endpoint to save the modified attendance status
+    fetch('http://localhost:5500/modifyAttendanceStatus', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ studentId, status: selectedStatus }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Attendance status updated successfully');
+            // Refresh the attendance list after modification
+            // You may need to fetch the updated attendance list and call displayAttendanceList again
+        } else {
+            console.error('Error updating attendance status:', data.message);
+            // Handle the error, e.g., show an error message to the user
+        }
+    })
+    .catch(error => {
+        console.error('Error updating attendance status:', error);
+        // Handle the error, e.g., show an error message to the user
+    });
+}
+
 function displayAttendanceList(attendanceList) {
     // Clear previous data
     attendanceListContainer.innerHTML = '';
@@ -129,7 +196,7 @@ function displayAttendanceList(attendanceList) {
 
     // Create headers
     const headerRow = document.createElement('tr');
-    const headers = ['Student Name', 'Student ID', 'Date', 'Timeslot', 'Subject', 'Instructor Name'];
+    const headers = ['Student Name', 'Student ID', 'Date', 'Timeslot', 'Subject', 'Instructor Name', 'Status', 'Action'];
     headers.forEach(headerText => {
         const header = document.createElement('th');
         header.textContent = headerText;
@@ -146,11 +213,24 @@ function displayAttendanceList(attendanceList) {
             attendance.date,
             attendance.timeslot,
             attendance.subject,
-            attendance.instructorName
+            attendance.instructorName,
+            attendance.status,
+            'Modify', // Placeholder for the modify button
         ];
-        data.forEach(cellData => {
+        data.forEach((cellData, index) => {
             const cell = document.createElement('td');
-            cell.textContent = cellData;
+            if (index === data.length - 1) {
+                // For the last cell (Action), create a modify button
+                const modifyButton = document.createElement('button');
+                modifyButton.textContent = 'Modify';
+                modifyButton.addEventListener('click', () => {
+                    // When the modify button is clicked, show the dropdown for modifying status
+                    showModifyDropdown(attendance.studentId, attendance.StudentName);
+                });
+                cell.appendChild(modifyButton);
+            } else {
+                cell.textContent = cellData;
+            }
             row.appendChild(cell);
         });
         table.appendChild(row);
@@ -158,6 +238,69 @@ function displayAttendanceList(attendanceList) {
 
     // Append the table to the container
     attendanceListContainer.appendChild(table);
+}
+
+function showModifyDropdown(studentId, studentName) {
+    const attendanceListContainer = document.getElementById("attendanceListContainer");
+
+    // Check if the attendanceListContainer is not null before setting innerHTML
+    if (attendanceListContainer) {
+        // Create a dropdown for modifying the status
+        const dropdownContainer = document.createElement("div");
+        dropdownContainer.classList.add("modify-dropdown");
+
+        const dropdownLabel = document.createElement("label");
+        dropdownLabel.textContent = "Modify Status:";
+        dropdownContainer.appendChild(dropdownLabel);
+
+        const statusDropdown = document.createElement("select");
+        statusDropdown.id = "statusDropdown";
+        const options = ["Present", "Absent", "Leave"];
+        options.forEach(optionText => {
+            const option = document.createElement("option");
+            option.value = optionText;
+            option.text = optionText;
+            statusDropdown.appendChild(option);
+        });
+
+        // Set the default option to "Present"
+        statusDropdown.value = "Present";
+
+        dropdownContainer.appendChild(statusDropdown);
+
+        // Create a button for modifying the status
+        const modifyButton = document.createElement("button");
+        modifyButton.textContent = "Modify";
+        modifyButton.addEventListener("click", () => {
+        const selectedStatus = statusDropdown.value;
+
+        // Store the modified status in the variable
+        modifiedStatuses[studentId] = selectedStatus;
+
+        // Call a function to update the displayed status
+        updateDisplayedStatus(studentId, selectedStatus);
+    });
+
+        dropdownContainer.appendChild(modifyButton);
+
+        // Append the dropdown to the attendanceListContainer
+        attendanceListContainer.appendChild(dropdownContainer);
+    } else {
+        console.error("Attendance List Container not found");
+    }
+}
+
+function updateDisplayedStatus(studentId, newStatus) {
+    // Update the displayed status in the table
+    const tableRows = document.querySelectorAll("#attendanceListContainer table tr");
+    tableRows.forEach(row => {
+        const idCell = row.cells[1]; // Assuming the second cell is the student ID cell
+        if (idCell.textContent === studentId) {
+            // Update the status cell
+            const statusCell = row.cells[row.cells.length - 2]; // Assuming the second-to-last cell is the status cell
+            statusCell.textContent = newStatus;
+        }
+    });
 }
 
 function generateQRCode() {
@@ -230,9 +373,43 @@ function generateQRCode() {
     }, 1000);
 }
 
-document.getElementById("generate-button").addEventListener("click", generateQRCode);
+function saveAttendanceList(attendanceList) {
+    // Call the backend endpoint to save the attendance list
+    fetch('http://localhost:5500/saveAttendanceList', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(attendanceList),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            console.log('Attendance list saved successfully');
+            // You can provide feedback to the user, e.g., show a success message
+        } else {
+            console.error('Error saving attendance list:', data.message);
+            // Handle the error, e.g., show an error message to the user
+        }
+    })
+    .catch(error => {
+        console.error('Error saving attendance list:', error);
+        // Handle the error, e.g., show an error message to the user
+    });
+}
 
-document.getElementById("refresh-button").addEventListener("click", function() {
+function handleModifyStatus(studentId, selectedStatus) {
+    // Implement logic to update the status in your data or make a server request
+
+    // For now, let's log the selected status
+    console.log(`Student ID: ${studentId}, Selected Status: ${selectedStatus}`);
+}
+
+document.getElementById("generate-button").addEventListener("click", generateQRCode);
+document.getElementById("refresh-button").addEventListener("click", function (event) {
+    // Prevent the default form submission behavior
+    event.preventDefault();
+
     // Retrieve the currently generated customFormat from localStorage
     const generatedCode = localStorage.getItem("generatedCode");
 
@@ -244,6 +421,60 @@ document.getElementById("refresh-button").addEventListener("click", function() {
         // Handle the case when no QR code has been generated
         console.error("No QR code has been generated.");
     };
+});
+document.getElementById("saveSubmitButton").addEventListener("click", async () => {
+    // Prepare the data to be saved
+    const date = document.getElementById("date").value;
+    const timeslot = document.getElementById("timeslot").value;
+    const semester = document.getElementById("semester").value;
+    const subject = document.getElementById("subject").value;
+    const instructorName = "Instructor Name"; // Replace with the actual instructor name
+
+    const studentsData = [];
+
+    // Iterate through the modifiedStatuses and prepare data for each student
+    for (const [studentId, status] of Object.entries(modifiedStatuses)) {
+        studentsData.push({
+            studentId,
+            status,
+        });
+    }
+
+    // Prepare the payload to be sent to the server
+    const payload = {
+        date,
+        timeslot,
+        semester,
+        subject,
+        instructorName,
+        studentsData,
+    };
+
+    try {
+        // Send a request to your server to update/insert the data in the database
+        const response = await fetch("http://localhost:5500/updateModifiedAttendance", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Clear the modifiedStatuses variable after successfully updating the database
+            modifiedStatuses = {};
+            // Display a success message or take any other action as needed
+            console.log("Data updated successfully");
+        } else {
+            console.error("Error updating data:", result.message);
+            // Display an error message or take any other action as needed
+        }
+    } catch (error) {
+        console.error("Error updating data:", error);
+        // Display an error message or take any other action as needed
+    }
 });
 // //Final version
 // let qrContainer = document.getElementById("qrcode");
