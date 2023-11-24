@@ -237,10 +237,6 @@
     margin-bottom: 10px; /* Adds some space between the line and the footer text */
   }
 
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
   .sidebar {
     height: 100%;
     width: 255px;
@@ -316,13 +312,6 @@
     .sidebar a {float: left;}
     .main-content {margin-left: 0;}
   }
-
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #dee2d6;
-    margin: 0;
-    padding: 0;
-}
 
 .header {
     background-color: #007BFF;
