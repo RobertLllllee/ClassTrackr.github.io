@@ -698,7 +698,41 @@ app.post('/updateTotalClassAttended', async (req, res) => {
     res.status(500).json({ success: false, message: 'Error updating TotalClassAttended' });
   }
 });
+client.connect()
+    .then(() => {
+        db = client.db('Entities');
+       
+    })
+    .catch(err => console.error('Error connecting to the database:', err));
 
+app.get('/subjects', async (req, res) => {
+    try {
+        const subjects = await db.collection('Subject').find().toArray();
+        res.json(subjects);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.post('/deleteSubject', async (req, res) => {
+  try {
+      await client.connect();
+      const db = client.db("Entities");
+      const collection = db.collection('Subject');
+      const subjectId = req.body.subjectId;
+
+      const result = await collection.deleteOne({ _id: subjectId });
+      if (result.deletedCount === 1) {
+          res.json({ success: true });
+      } else {
+          res.json({ success: false, message: 'No subject found with that ID.' });
+      }
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
 app.listen(5500, () => console.log('Server Started!'));
 
 // app.get('/fetchStudentDetails', async (req, res) => {
