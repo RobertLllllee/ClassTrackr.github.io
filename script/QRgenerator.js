@@ -4,6 +4,7 @@ let qrContainer = document.getElementById("qrcode");
 let codeContainer = document.getElementById("code");
 let expiryMessage = document.getElementById("expiry-message");
 let countdownContainer = document.getElementById("countdown");
+let attendanceListContainer = document.getElementById("attendanceListContainer");
 let countdownInterval;
 
 function populateTimeslots() {
@@ -97,7 +98,7 @@ function generateCustomFormat() {
     return customFormat;
 }
 
-function generateQRCode() {
+async function generateQRCode() {
     const date = document.getElementById("date").value;
     const timeslot = document.getElementById("timeslot").value;
     const subject = document.getElementById("subject").value;
@@ -171,8 +172,9 @@ function generateQRCode() {
 
 document.getElementById("generate-button").addEventListener("click", generateQRCode);
 
-qrContainer.addEventListener("click", function() {
-    // Fetch and display the list of students who attended
+// New button to refresh the attendance list
+document.getElementById("refresh-button").addEventListener("click", function() {
+    // Fetch and refresh the list of students who attended
     fetchAttendanceList();
 });
 
