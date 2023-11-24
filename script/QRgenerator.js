@@ -88,6 +88,11 @@ fetchSemesters();
 // Variable to store modified statuses
 let modifiedStatuses = {};
 
+document.getElementById("semester").addEventListener("change", function () {
+    const selectedSemester = this.value;
+    fetchSubjects(selectedSemester);
+});
+
 document.getElementById("semester").addEventListener("change", function() {
     const selectedSemester = this.value;
     fetchSubjects(selectedSemester);
@@ -126,6 +131,7 @@ function fetchAttendanceList(customFormat) {
 }
 
 function modifyAttendanceStatus(studentId, currentStatus) {
+    // Modify attendance status directly without using a dropdown
     const newStatus = prompt("Modify attendance status (Absent, Present, Leave):", currentStatus);
 
     if (newStatus !== null) {
@@ -214,7 +220,7 @@ function displayAttendanceList(attendanceList) {
             attendance.timeslot,
             attendance.subject,
             attendance.instructorName,
-            attendance.status,
+            'Present', // Set the default value to "Present"
             'Modify', // Placeholder for the modify button
         ];
         data.forEach((cellData, index) => {
@@ -225,7 +231,7 @@ function displayAttendanceList(attendanceList) {
                 modifyButton.textContent = 'Modify';
                 modifyButton.addEventListener('click', () => {
                     // When the modify button is clicked, show the dropdown for modifying status
-                    showModifyDropdown(attendance.studentId, attendance.StudentName);
+                    showModifyDropdown(attendance.studentId);
                 });
                 cell.appendChild(modifyButton);
             } else {
@@ -240,6 +246,7 @@ function displayAttendanceList(attendanceList) {
     attendanceListContainer.appendChild(table);
 }
 
+// Function to display the modify dropdown
 function showModifyDropdown(studentId, studentName) {
     const attendanceListContainer = document.getElementById("attendanceListContainer");
 
@@ -303,7 +310,7 @@ function updateDisplayedStatus(studentId, newStatus) {
     });
 }
 
-function generateQRCode() {
+function generateQRCode(studentId) {
     const date = document.getElementById("date").value;
     const timeslot = document.getElementById("timeslot").value;
     const subject = document.getElementById("subject").value;
@@ -371,6 +378,12 @@ function generateQRCode() {
             countdownContainer.innerHTML = `Expires in ${minutes}m ${seconds}s`;
         }
     }, 1000);
+
+    // Display the status box with "Present" by default
+    const statusBox = document.getElementById(`status-${studentId}`);
+    if (statusBox) {
+        statusBox.textContent = 'Present';
+    }
 }
 
 function saveAttendanceList(attendanceList) {
