@@ -471,6 +471,80 @@ app.get('/fetchUpdatedInfo', (req, res) => {
   }
 });
 
+app.get('/checksubject/:studentId', async (req, res) => {
+  try {
+      const studentId = req.params.studentId;
+
+      // Step 2: Fetch Current Semester
+      const student = await req.dbClient.db("Entities").collection("Student").findOne(
+          { StudentID: studentId },
+          { projection: { StudentCurSem: 1 } }
+      );
+
+      if (!student || !student.StudentCurSem) {
+          return res.status(404).send('Student not found or missing current semester information.');
+      }
+
+      const currentSemester = student.StudentCurSem;
+
+      // Step 3: Fetch Subjects for Current Semester
+      const subjects = await req.dbClient.db("Entities").collection("Subject").findOne(
+          { semester: currentSemester },
+          { projection: { subjects: 1 } }
+      );
+
+      if (!subjects || !subjects.subjects || !subjects.subjects[currentSemester]) {
+          return res.status(404).send('Subjects not found for the current semester.');
+      }
+
+      const semesterSubjects = subjects.subjects[currentSemester];
+
+      // Step 4: Display Subjects in HTML
+      res.render('checksubject', { studentId, currentSemester, semesterSubjects });
+  } catch (error) {
+      console.error('Error fetching subjects:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/fetchStudentCurSemSubjects', async (req, res) => {
+  try {
+    const studentId = req.query.studentId;
+    const studentCollection = client.db("Entities").collection("Student");
+
+    const student = await studentCollection.findOne({ StudentID: studentId });
+
+    if (student) {
+      const currentSemester = student.StudentCurSem;
+
+      // Fetch subjects for the current semester from the Subject collection
+      const subjectCollection = client.db("Entities").collection("Subject");
+      const subjects = await subjectCollection.find({ semester: currentSemester }).toArray();
+
+      res.json({ success: true, currentSemester, subjects });
+    } else {
+      res.json({ success: false, message: 'Student not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching student current semester and subjects:', error);
+    res.json({ success: false, message: 'Error fetching student current semester and subjects' });
+  }
+});
+
+app.get('/fetchSubjectsBySemester', async (req, res) => {
+  try {
+    const semester = req.query.semester;
+    const collection = client.db("Entities").collection("Subject");
+
+    const subjects = await collection.find({ semester: parseInt(semester) }).toArray();
+
+    res.json(subjects);
+  } catch (error) {
+    console.error('Error fetching subjects by semester:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 app.listen(5500, () => console.log('Server Started!'));
 
 // app.get('/fetchStudentDetails', async (req, res) => {
