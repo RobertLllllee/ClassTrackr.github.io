@@ -98,7 +98,69 @@ function generateCustomFormat() {
     return customFormat;
 }
 
-async function generateQRCode() {
+function fetchAttendanceList(customFormat) {
+    try {
+        // Fetch attendance list based on the customFormat
+        fetch(`http://localhost:5500/fetchAttendanceList?customFormat=${customFormat}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Display the attendance list in a table
+                    displayAttendanceList(data.attendanceList);
+                } else {
+                    console.error('Error fetching attendance list:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching attendance list:', error);
+            });
+    } catch (error) {
+        console.error('Error fetching attendance list:', error);
+    }
+}
+
+function displayAttendanceList(attendanceList) {
+    // Clear previous data
+    attendanceListContainer.innerHTML = '';
+
+    // Create a table
+    const table = document.createElement('table');
+    table.border = '1';
+
+    // Create headers
+    const headerRow = document.createElement('tr');
+    const headers = ['Student Name', 'Student ID', 'Date', 'Timeslot', 'Subject', 'Instructor Name'];
+    headers.forEach(headerText => {
+        const header = document.createElement('th');
+        header.textContent = headerText;
+        headerRow.appendChild(header);
+    });
+    table.appendChild(headerRow);
+
+    // Create rows with attendance data
+    attendanceList.forEach(attendance => {
+        const row = document.createElement('tr');
+        const data = [
+            attendance.StudentName,
+            attendance.studentId,
+            attendance.date,
+            attendance.timeslot,
+            attendance.subject,
+            attendance.instructorName
+        ];
+        data.forEach(cellData => {
+            const cell = document.createElement('td');
+            cell.textContent = cellData;
+            row.appendChild(cell);
+        });
+        table.appendChild(row);
+    });
+
+    // Append the table to the container
+    attendanceListContainer.appendChild(table);
+}
+
+function generateQRCode() {
     const date = document.getElementById("date").value;
     const timeslot = document.getElementById("timeslot").value;
     const subject = document.getElementById("subject").value;
@@ -147,9 +209,8 @@ async function generateQRCode() {
     // Save the generated code to localStorage
     localStorage.setItem("generatedCode", customFormat);
 
-  // Redirect if the QR code is scanned
-  qrContainer.addEventListener("click", function() {
-});
+    // Fetch and display attendance list based on the customFormat
+    fetchAttendanceList(customFormat);
 
     const expirationTime = new Date().getTime() + 5 * 60 * 1000; // 5 minutes in milliseconds
 
@@ -167,54 +228,23 @@ async function generateQRCode() {
             countdownContainer.innerHTML = `Expires in ${minutes}m ${seconds}s`;
         }
     }, 1000);
-
 }
 
 document.getElementById("generate-button").addEventListener("click", generateQRCode);
 
-// New button to refresh the attendance list
 document.getElementById("refresh-button").addEventListener("click", function() {
-    // Fetch and refresh the list of students who attended
-    fetchAttendanceList();
-});
+    // Retrieve the currently generated customFormat from localStorage
+    const generatedCode = localStorage.getItem("generatedCode");
 
-async function fetchAttendanceList() {
-    try {
-        const response = await fetch('http://localhost:5500/fetchAttendanceList');
-        const data = await response.json();
-
-        if (data.success) {
-            displayAttendanceList(data.attendanceList);
-        } else {
-            console.error('Error fetching attendance list:', data.message);
-        }
-    } catch (error) {
-        console.error('Error fetching attendance list:', error);
-    }
-}
-
-function displayAttendanceList(attendanceList) {
-    attendanceListContainer.innerHTML = '';
-
-    if (attendanceList && attendanceList.length > 0) {
-        const table = document.createElement("table");
-        table.innerHTML = "<tr><th>Student ID</th><th>Student Name</th></tr>";
-
-        attendanceList.forEach((student) => {
-            const row = table.insertRow();
-            const cell1 = row.insertCell(0);
-            const cell2 = row.insertCell(1);
-
-            cell1.textContent = student.studentId;
-            cell2.textContent = student.studentName;
-        });
-
-        attendanceListContainer.appendChild(table);
+    // Check if a QR code has been generated
+    if (generatedCode) {
+        // Call fetchAttendanceList with the currently generated customFormat
+        fetchAttendanceList(generatedCode);
     } else {
-        attendanceListContainer.textContent = 'No attendance records available.';
-    }
-}
-
+        // Handle the case when no QR code has been generated
+        console.error("No QR code has been generated.");
+    };
+});
 // //Final version
 // let qrContainer = document.getElementById("qrcode");
 // let codeContainer = document.getElementById("code");

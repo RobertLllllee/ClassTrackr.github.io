@@ -401,6 +401,8 @@ async function fetchStudentId(studentName) {
 
 app.post('/updateAttendance', async (req, res) => {
   try {
+    console.log('Received attendance data:', req.body);
+
     const collection = client.db("Entities").collection("AttendanceRecords");
 
     if (!req.body || !req.body.StudentName || !req.body.date || !req.body.timeslot || !req.body.subject || !req.body.instructorName) {
@@ -409,17 +411,22 @@ app.post('/updateAttendance', async (req, res) => {
       return;
     }
 
+    // Check if customFormat is present, if not, set a default value or handle accordingly
+    const customFormat = req.body.customFormat || 'DefaultCustomFormat';
+
     const studentId = await fetchStudentId(req.body.StudentName);
 
     if (studentId) {
       req.body.studentId = studentId;
+      req.body.customFormat = customFormat; // Add customFormat to the request body
 
       const result = await collection.insertOne(req.body);
-      if (result && result.ops && result.ops.length > 0) {
-        console.log('Attendance record inserted:', result.ops[0]);
-      } else {
-        console.error('Error inserting attendance record. Result:', result);
-      }
+
+if (result && result.ops && result.ops.length > 0) {
+  console.log('Attendance record inserted:', result.ops[0]);
+} else {
+  console.error('Error inserting attendance record. Result:', result);
+}
 
       res.json({ success: true, message: 'Attendance record updated successfully' });
     } else {
@@ -435,11 +442,32 @@ app.post('/updateAttendance', async (req, res) => {
 app.get('/fetchAttendanceList', async (req, res) => {
   try {
       const collection = client.db("Entities").collection("AttendanceRecords");
-      const attendanceList = await collection.find().toArray();
+
+      // Retrieve the customFormat from the query parameters
+      const customFormat = req.query.customFormat;
+
+      // Filter the attendance records based on the customFormat
+      const attendanceList = await collection.find({ customFormat }).toArray();
+
       res.json({ success: true, attendanceList });
   } catch (error) {
       console.error('Error fetching attendance list:', error);
       res.json({ success: false, message: 'Error fetching attendance list' });
+  }
+});
+
+app.get('/fetchUpdatedInfo', (req, res) => {
+  try {
+    // Fetch the updated information from your database or any source
+    const updatedInfo = {
+      studentName: 'Updated Student Name', // Replace with the actual updated data
+      studentId: 'Updated Student ID', // Replace with the actual updated data
+    };
+
+    res.json({ success: true, updatedInfo });
+  } catch (error) {
+    console.error('Error fetching updated information:', error);
+    res.json({ success: false, message: 'Error fetching updated information' });
   }
 });
 

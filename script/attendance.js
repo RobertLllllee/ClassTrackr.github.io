@@ -276,45 +276,77 @@ async function fetchStudentId(studentName) {
 
 async function markAttendance(date, timeslot, subject, instructorName, customFormat) {
   try {
-      // Fetch user details from session
-      const userId = sessionStorage.getItem('userId');
-      const userName = sessionStorage.getItem('userName');
+    // Fetch user details from session
+    const userId = sessionStorage.getItem('userId');
+    const userName = sessionStorage.getItem('userName');
 
-      if (!userId || !userName) {
-          console.error('User details not found');
-          return;
-      }
+    if (!userId || !userName) {
+      console.error('User details not found');
+      return;
+    }
 
-      // Use fetch to send attendance data to the server
-      const response = await fetch('http://localhost:5500/updateAttendance', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              StudentName: userName,
-              studentId: userId,
-              date: date,
-              timeslot: timeslot,
-              subject: subject,
-              instructorName: instructorName,
-              customFormat: customFormat, // Include custom code in attendance data
-          }),
-      });
+    // Use fetch to send attendance data to the server
+    const response = await fetch('http://localhost:5500/updateAttendance', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        StudentName: userName,
+        studentId: userId,
+        date: date,
+        timeslot: timeslot,
+        subject: subject,
+        instructorName: instructorName,
+        customFormat: customFormat, // Include custom code in attendance data
+      }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (data.success) {
-          console.log('Attendance record updated successfully');
+    if (data.success) {
+      console.log('Attendance record updated successfully');
 
-          // Redirect to the dashboard
-          window.location.href = 'student.html';
+      // Fetch updated information from the server
+      const updatedInfo = await fetchUpdatedInfo();
 
-      } else {
-          console.error('Error updating attendance:', data.message);
-      }
+      // Display the updated information in the QR.html page
+      displayUpdatedInfo(updatedInfo);
+
+      // Redirect to the dashboard
+      window.location.href = 'student.html';
+    } else {
+      console.error('Error updating attendance:', data.message);
+    }
   } catch (error) {
-      console.error('Error marking attendance:', error);
+    console.error('Error marking attendance:', error);
+  }
+}
+
+// Function to fetch updated information from the server
+async function fetchUpdatedInfo() {
+  try {
+    const response = await fetch('http://localhost:5500/fetchUpdatedInfo'); // Add a new endpoint to fetch updated info
+    const data = await response.json();
+
+    if (data.success) {
+      return data.updatedInfo;
+    } else {
+      console.error('Error fetching updated information:', data.message);
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching updated information:', error);
+    return null;
+  }
+}
+
+// Function to display the updated information in the QR.html page
+function displayUpdatedInfo(updatedInfo) {
+  // Update the QR.html page with the updated information
+  const updatedInfoContainer = document.getElementById('updatedInfo');
+  if (updatedInfoContainer) {
+    updatedInfoContainer.innerHTML = `<p>Student Name: ${updatedInfo.studentName}</p><p>Student ID: ${updatedInfo.studentId}</p>`;
   }
 }
 
@@ -382,8 +414,8 @@ function startFacialRecognition() {
 
             // Mark attendance only if recognition is successful and it hasn't been marked before
             if (recognitionSuccessful) {
-              console.log('Marking attendance...');
-              markAttendance(details.date, details.timeslot, details.subject, details.instructor);
+            console.log('Marking attendance...');
+            markAttendance(details.date, details.timeslot, details.subject, details.instructor, details.customFormat);
 
               recognitionSuccessful = false; // Reset the flag
             }
