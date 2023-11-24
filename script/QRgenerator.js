@@ -248,20 +248,23 @@ function displayAttendanceList(attendanceList) {
 
 // Function to display the modify dropdown
 function showModifyDropdown(studentId, studentName) {
-    const attendanceListContainer = document.getElementById("attendanceListContainer");
+    const existingDropdown = document.getElementById(`modify-dropdown-${studentId}`);
 
-    // Check if the attendanceListContainer is not null before setting innerHTML
-    if (attendanceListContainer) {
+    if (existingDropdown) {
+        // If the dropdown already exists, remove it (toggle)
+        existingDropdown.remove();
+    } else {
         // Create a dropdown for modifying the status
         const dropdownContainer = document.createElement("div");
         dropdownContainer.classList.add("modify-dropdown");
+        dropdownContainer.id = `modify-dropdown-${studentId}`;
 
         const dropdownLabel = document.createElement("label");
         dropdownLabel.textContent = "Modify Status:";
         dropdownContainer.appendChild(dropdownLabel);
 
         const statusDropdown = document.createElement("select");
-        statusDropdown.id = "statusDropdown";
+        statusDropdown.id = `statusDropdown-${studentId}`;
         const options = ["Present", "Absent", "Leave"];
         options.forEach(optionText => {
             const option = document.createElement("option");
@@ -277,23 +280,24 @@ function showModifyDropdown(studentId, studentName) {
 
         // Create a button for modifying the status
         const modifyButton = document.createElement("button");
-        modifyButton.textContent = "Modify";
+        modifyButton.textContent = "Update Status"; // Change the button text
         modifyButton.addEventListener("click", () => {
-        const selectedStatus = statusDropdown.value;
+            const selectedStatus = statusDropdown.value;
 
-        // Store the modified status in the variable
-        modifiedStatuses[studentId] = selectedStatus;
+            // Store the modified status in the variable
+            modifiedStatuses[studentId] = selectedStatus;
 
-        // Call a function to update the displayed status
-        updateDisplayedStatus(studentId, selectedStatus);
-    });
+            // Call a function to update the displayed status
+            updateDisplayedStatus(studentId, selectedStatus);
+
+            // Remove the dropdown after updating the status
+            existingDropdown.remove();
+        });
 
         dropdownContainer.appendChild(modifyButton);
 
         // Append the dropdown to the attendanceListContainer
         attendanceListContainer.appendChild(dropdownContainer);
-    } else {
-        console.error("Attendance List Container not found");
     }
 }
 
@@ -409,13 +413,6 @@ function saveAttendanceList(attendanceList) {
         console.error('Error saving attendance list:', error);
         // Handle the error, e.g., show an error message to the user
     });
-}
-
-function handleModifyStatus(studentId, selectedStatus) {
-    // Implement logic to update the status in your data or make a server request
-
-    // For now, let's log the selected status
-    console.log(`Student ID: ${studentId}, Selected Status: ${selectedStatus}`);
 }
 
 document.getElementById("generate-button").addEventListener("click", generateQRCode);
