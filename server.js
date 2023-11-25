@@ -212,6 +212,25 @@ async function fetchStudentId(studentName) {
   }
 }
 
+// Add a new route to fetch student name by studentId
+app.get('/fetchStudentName', async (req, res) => {
+  try {
+      const studentId = req.query.studentId;
+      const collection = client.db("Entities").collection("Student");
+
+      const student = await collection.findOne({ StudentID: studentId });
+
+      if (student) {
+          res.json({ success: true, studentName: student.StudentName });
+      } else {
+          res.json({ success: false, message: 'Student not found' });
+      }
+  } catch (error) {
+      console.error('Error fetching student name:', error);
+      res.json({ success: false, message: 'Error fetching student name' });
+  }
+});
+
 app.post('/updateAttendance', async (req, res) => {
   try {
     console.log('Received attendance data:', req.body);
@@ -764,6 +783,22 @@ app.post('/updateAttendanceRate', async (req, res) => {
   } catch (error) {
     console.error('Error updating Attendance Rate:', error);
     res.status(500).json({ success: false, message: 'Error updating Attendance Rate' });
+  }
+});
+
+app.get('/getAttendanceReport', async (req, res) => {
+  try {
+      const collection = client.db("Entities").collection('Attendance');
+
+      // Exclude the _id field from the projection
+      const projection = { _id: 0 };
+
+      const attendanceData = await collection.find({}, { projection }).toArray();
+
+      res.json(attendanceData);
+  } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).send('Internal Server Error');
   }
 });
 

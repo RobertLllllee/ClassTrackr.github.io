@@ -24,3 +24,7 @@ window.onload = function() {
         // Change window.location to the path of your QR.html file
         window.location.href = 'QR.html';
     }
+
+    function redirectToAttendanceReportPage(){
+      window.location.href = 'AttReportIns.html';
+    }
