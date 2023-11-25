@@ -19,6 +19,7 @@ document.getElementById('sidebar-toggle-btn').addEventListener('click', function
     updateCurrentTime();
     await updateTotalClassAttended();
     await updateTotalClasses();
+    await updateAttendanceRate();
   };
   
   function displayUserDetails() {
@@ -49,7 +50,8 @@ document.getElementById('sidebar-toggle-btn').addEventListener('click', function
         const data = await response.json();
   
         if (data.success) {
-          attendedClassesElement.textContent = data.totalClassAttended;
+          const attendedClasses = parseInt(data.totalClassAttended, 10);
+          attendedClassesElement.textContent = attendedClasses;
         } else {
           console.error('Error updating TotalClassAttended:', data.message);
         }
@@ -77,7 +79,8 @@ document.getElementById('sidebar-toggle-btn').addEventListener('click', function
         const data = await response.json();
   
         if (data.success) {
-          totalClassesElement.textContent = data.totalClasses;
+          const totalClasses = parseInt(data.totalClasses, 10);
+          totalClassesElement.textContent = totalClasses;
         } else {
           console.error('Error fetching TotalClasses:', data.message);
         }
@@ -86,6 +89,64 @@ document.getElementById('sidebar-toggle-btn').addEventListener('click', function
       }
     } else {
       console.error('Element with ID "totalClasses" not found.');
+    }
+  }
+  
+  async function updateAttendanceRate() {
+    const attendanceRateElement = document.getElementById('attendanceRate');
+    if (attendanceRateElement) {
+      // Fetch TotalClassAttended and TotalClasses from your server
+      try {
+        const responseAttended = await fetch('http://localhost:5500/getTotalClassAttended', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ studentId: sessionStorage.getItem('userId') }),
+        });
+  
+        const responseTotalClasses = await fetch('http://localhost:5500/getTotalClasses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ studentId: sessionStorage.getItem('userId') }),
+        });
+  
+        const dataAttended = await responseAttended.json();
+        const dataTotalClasses = await responseTotalClasses.json();
+  
+        if (dataAttended.success && dataTotalClasses.success) {
+          const attendedClasses = parseInt(dataAttended.totalClassAttended, 10);
+          const totalClasses = parseInt(dataTotalClasses.totalClasses, 10);
+  
+          // Ensure that both attendedClasses and totalClasses are valid numbers
+          if (!isNaN(attendedClasses) && !isNaN(totalClasses) && totalClasses > 0) {
+            const attendanceRate = ((attendedClasses / totalClasses) * 100).toFixed(2);
+            attendanceRateElement.textContent = `${attendanceRate}%`;
+  
+            // Update the AttendanceRate in your server
+            await fetch('http://localhost:5500/updateAttendanceRate', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                studentId: sessionStorage.getItem('userId'),
+                attendanceRate: parseFloat(attendanceRate),
+              }),
+            });
+          } else {
+            console.error('Invalid attendedClasses or totalClasses values.');
+          }
+        } else {
+          console.error('Error fetching TotalClassAttended or TotalClasses:', dataAttended.message || dataTotalClasses.message);
+        }
+      } catch (error) {
+        console.error('Error updating AttendanceRate:', error);
+      }
+    } else {
+      console.error('Element with ID "attendanceRate" not found.');
     }
   }
   

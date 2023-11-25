@@ -651,8 +651,7 @@ app.post('/submitAbsenceForm', async (req, res) => {
 app.post('/getTotalClassAttended', async (req, res) => {
   try {
     const studentId = req.body.studentId;
-
-    const studentCollection = req.dbClient.db("Entities").collection("Student");
+    const studentCollection = client.db("Entities").collection("Student");
 
     // Find the student by StudentID
     const student = await studentCollection.findOne({ StudentID: studentId });
@@ -671,7 +670,6 @@ app.post('/getTotalClassAttended', async (req, res) => {
 async function getStudentTotalClasses(studentId) {
   try {
     const studentCollection = client.db("Entities").collection("Student");
-
     const student = await studentCollection.findOne({ StudentID: studentId });
 
     if (student && student.StudentCurSem) {
@@ -694,7 +692,6 @@ async function getStudentTotalClasses(studentId) {
   }
 }
 
-// Add this helper function to calculate TotalClasses
 function calculateTotalClasses(subjects) {
   let totalClasses = 0;
 
@@ -705,7 +702,6 @@ function calculateTotalClasses(subjects) {
   return totalClasses;
 }
 
-// Add this route to your server.js
 app.post('/updateTotalClasses', async (req, res) => {
   try {
     const { studentId } = req.body;
@@ -713,7 +709,7 @@ app.post('/updateTotalClasses', async (req, res) => {
     const totalClasses = await getStudentTotalClasses(studentId);
 
     if (totalClasses !== null) {
-      const result = await req.dbClient.db("Entities").collection("Student").updateOne(
+      const result = await client.db("Entities").collection("Student").updateOne(
         { StudentID: studentId },
         { $set: { TotalClasses: totalClasses } }
       );
@@ -735,8 +731,7 @@ app.post('/updateTotalClasses', async (req, res) => {
 app.post('/getTotalClasses', async (req, res) => {
   try {
     const studentId = req.body.studentId;
-
-    const studentCollection = req.dbClient.db("Entities").collection("Student");
+    const studentCollection = client.db("Entities").collection("Student");
 
     // Find the student by StudentID
     const student = await studentCollection.findOne({ StudentID: studentId });
@@ -749,6 +744,26 @@ app.post('/getTotalClasses', async (req, res) => {
   } catch (error) {
     console.error('Error fetching TotalClasses:', error);
     res.status(500).json({ success: false, message: 'Error fetching TotalClasses' });
+  }
+});
+
+app.post('/updateAttendanceRate', async (req, res) => {
+  try {
+    const { studentId, attendanceRate } = req.body;
+
+    const result = await client.db("Entities").collection("Student").updateOne(
+      { StudentID: studentId },
+      { $set: { AttendanceRate: parseFloat(attendanceRate) } }
+    );
+
+    if (result.modifiedCount > 0) {
+      res.json({ success: true, message: 'Attendance Rate updated successfully', attendanceRate });
+    } else {
+      res.json({ success: false, message: 'Attendance Rate not updated' });
+    }
+  } catch (error) {
+    console.error('Error updating Attendance Rate:', error);
+    res.status(500).json({ success: false, message: 'Error updating Attendance Rate' });
   }
 });
 
