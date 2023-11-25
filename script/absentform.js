@@ -40,21 +40,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (data.success) {
                     updateStudentDetails(data.studentDetails);
-                    toggleDetailsContainers(true);
+                    toggleDetailsContainers(true, true, false);
                 } else {
                     clearStudentDetails();
                     alert(data.message);
-                    toggleDetailsContainers(false);
+                    toggleDetailsContainers(false, false, false);
                 }
             } else {
                 clearStudentDetails();
                 alert('Failed to retrieve student details');
-                toggleDetailsContainers(false);
+                toggleDetailsContainers(false, false, false);
             }
         } catch (error) {
             console.error(error);
             alert('An error occurred while processing your request');
-            toggleDetailsContainers(false);
+            toggleDetailsContainers(false, false, false);
         }
     });
 
@@ -63,7 +63,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (studentDetails.hasOwnProperty(key)) {
                 const element = document.getElementById(key);
                 if (element) {
-                    element.value = studentDetails[key];
+                    if (key === 'StudentDOB') {
+                        updateDOBDetails(element, studentDetails[key]);
+                    } else {
+                        element.textContent = JSON.stringify(studentDetails[key]);
+                    }
                 }
             }
         }
@@ -76,9 +80,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function toggleDetailsContainers(show) {
-        studentDetailsContainer.style.display = show ? 'block' : 'none';
-        absenceDetailsContainer.style.display = show ? 'block' : 'none';
+    function updateDOBDetails(parentElement, dobObject) {
+        for (const key in dobObject) {
+            if (dobObject.hasOwnProperty(key)) {
+                const element = document.getElementById(`DOB${key}`);
+                if (element) {
+                    element.textContent = JSON.stringify(dobObject[key]);
+                }
+            }
+        }
+    }
+
+    function toggleDetailsContainers(showStudentDetails, showAbsenceDetails, showAbsenceRequestDetails) {
+        studentDetailsContainer.style.display = showStudentDetails ? 'block' : 'none';
+        absenceDetailsContainer.style.display = showAbsenceDetails ? 'block' : 'none';
+        absenceRequestDetailsContainer.style.display = showAbsenceRequestDetails ? 'block' : 'none';
     }
 
     // Function to add another subject and instructor field
@@ -100,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle form submission (you can customize this part)
     const absenceForm = document.getElementById('absence-form');
-    absenceForm.addEventListener('submit', function (event) {
+    absenceForm.addEventListener('submit', async function (event) {
         event.preventDefault();
 
         // Gather and process form data
@@ -126,6 +142,87 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('display-subject').textContent = subjectText;
 
         // Show the absence request details section
-        absenceRequestDetailsContainer.style.display = 'block';
+        toggleDetailsContainers(true, true, true);
+
+        // Add a section for the lecturer's signature
+        const lecturerSignatureContainer = document.createElement('div');
+        lecturerSignatureContainer.innerHTML = `
+            <h2>Lecturer's Signature</h2>
+            <label for="lecturerSignature">Lecturer's Signature:</label>
+            <input type="text" id="lecturerSignature" name="lecturerSignature" required><br>
+            <button type="button" onclick="submitFormWithSignature()">Submit Form with Signature</button>
+        `;
+
+        // Append the new container to the document
+        document.body.appendChild(lecturerSignatureContainer);
+
+        // Add an event listener to the new button for submitting the form with the signature
+        document.querySelector('button[onclick="submitFormWithSignature()"]').addEventListener('click', async function () {
+            // You can handle form submission with lecturer's signature here
+            alert('Form submitted with lecturer\'s signature');
+        });
     });
 });
+
+// Function to check instructor
+async function checkInstructor() {
+    const instructorName = document.getElementById('instructorName').value;
+
+    try {
+        const response = await fetch('http://localhost:5500/checkInstructor', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ instructorName }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.exists) {
+                alert('Instructor exists. You can submit the form.');
+                // Enable the submit button or perform other actions
+            } else {
+                alert('Instructor does not exist. Please check the name.');
+                // Disable the submit button or perform other actions
+            }
+        } else {
+            alert('Failed to check instructor. Please try again.');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('An error occurred while checking instructor.');
+    }
+}
+
+// Function to submit form with signature
+async function submitFormWithSignature() {
+    const lecturerSignature = document.getElementById('lecturerSignature').value;
+
+    try {
+        const response = await fetch('http://localhost:5500/submitFormWithSignature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ lecturerSignature }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data.success) {
+                alert('Form submitted successfully with lecturer\'s signature');
+                // You can perform further actions, e.g., notify the user
+            } else {
+                alert('Failed to submit form with lecturer\'s signature');
+            }
+        } else {
+            alert('Failed to submit form with lecturer\'s signature');
+        }
+    } catch (error) {
+        console.error(error);
+        alert('An error occurred while submitting form with lecturer\'s signature');
+    }
+}

@@ -1,0 +1,163 @@
+body {
+    background-color: #EBE9E9;
+    color: #3581B8;
+    font-family: Arial, sans-serif;
+}
+
+h1, h2 {
+    color: #FCB07E;
+}
+
+label {
+    color: #3581B8;
+    font-weight: bold;
+}
+
+input[type="text"],
+input[type="date"],
+textarea,
+input[type="file"] {
+    background-color: #F3F8F2;
+    border: 1px solid #3581B8;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #FCB07E;
+    color: #EBE9E9;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #DEE2D6;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+#absence-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+#subject-instructor-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+#subject-instructor-container input {
+    flex: 1;
+    margin-right: 5px;
+}
+
+#absence-request-details label {
+    margin-top: 10px;
+    display: block;
+}
+
+#instructorName {
+    background-color: #F3F8F2;
+    border: 1px solid #3581B8;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  .sidebar {
+    height: 100%;
+    width: 255px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #3581b8;
+    overflow-x: hidden;
+    padding-top: 20px;
+    box-shadow: 3px 0px 5px rgba(0,0,0,0.2); /* Adjust values as necessary */
+    transition: margin-left 0.3s; /* smooth transition for sidebar */
+  }
+  .sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #ddd;
+    display: block;
+  }
+  .sidebar a:hover {
+    color: #fff;
+    background: #575757;
+  }
+ /* When sidebar is closed, we'll use a class to adjust its margin */
+ .sidebar-closed {
+  margin-left: -250px; /* Adjust to your sidebar's width */
+}
+
+  .logo {
+    display: flex;
+    align-items: center; /* Vertically align the logo and website name */
+}
+.logo img {
+    width: 100px;
+   margin-right: 10px;
+}
+.website-name {
+    color: #ebe9e9; /*text color*/
+    font-size: 22px;
+    font-family: Impact, fantasy;
+}
+.menu li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+  .main-content {
+    margin-left: 240px;
+    padding: 15px;
+    padding-top: 75px; /* Adjust this value to the height of your header plus some space */
+    transition: margin-left 0.3s; /* smooth transition for content */
+  }
+   /* Adjust main content margin when sidebar is closed */
+.sidebar-closed ~ .main-content {
+  margin-left: 0;
+}
+  /* New or updated styles for the h1 within .main-content */
+.main-content h1 {
+  margin-left: 20px; /* Aligns the h1 with the .timetable margin */
+  /* If you need to adjust the right as well, you can use the following:
+  margin: 0 20px 20px; */
+}
+  .main-content h2 {
+    color: #333;
+  }
+  
+  /* Basic responsiveness */
+  @media screen and (max-width: 600px) {
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .sidebar a {float: left;}
+    .main-content {margin-left: 0;}
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #dee2d6;
+    margin: 0;
+    padding: 0;
+}
+
+/* Add more styles as needed */
