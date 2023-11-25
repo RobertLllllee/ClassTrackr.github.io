@@ -80,7 +80,7 @@ async function fetchSemesters() {
 }
 
 // Ensure to call fetchSemesters to initialize the semesters dropdown
-fetchSemesters();
+// fetchSemesters();
 
 populateTimeslots();
 fetchSemesters();
@@ -89,11 +89,6 @@ fetchSemesters();
 let modifiedStatuses = {};
 
 document.getElementById("semester").addEventListener("change", function () {
-    const selectedSemester = this.value;
-    fetchSubjects(selectedSemester);
-});
-
-document.getElementById("semester").addEventListener("change", function() {
     const selectedSemester = this.value;
     fetchSubjects(selectedSemester);
 });
@@ -199,32 +194,6 @@ function saveModifiedStatus(studentId, selectedStatus) {
     })
     .catch(error => {
         console.error('Error updating attendance status:', error);
-        // Handle the error, e.g., show an error message to the user
-    });
-}
-
-function updateTotalClassAttended(studentId) {
-    console.log('Updating TotalClassAttended for student:', studentId);
-
-    // Call the backend endpoint to update TotalClassAttended in the Student collection
-    fetch('http://localhost:5500/updateTotalClassAttended', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ studentId }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            console.log('TotalClassAttended updated successfully for student:', studentId);
-        } else {
-            console.error('Error updating TotalClassAttended:', data.message);
-            // Handle the error, e.g., show an error message to the user
-        }
-    })
-    .catch(error => {
-        console.error('Error updating TotalClassAttended:', error);
         // Handle the error, e.g., show an error message to the user
     });
 }
@@ -471,7 +440,7 @@ document.getElementById("refresh-button").addEventListener("click", function (ev
 });
 
 // Function to update TotalClassAttended for students with 'Present' status in the Attendance collection
-async function updateStudentTotalClassAttended(attendanceList) {
+async function updateTotalClassAttended(attendanceList) {
     try {
         for (const attendance of attendanceList) {
             const { studentId, status } = attendance;
@@ -571,6 +540,10 @@ document.getElementById("saveSubmitButton").addEventListener("click", async () =
         console.error("Error updating data:", error);
         // Display an error message or take any other action as needed
     }
+
+     // Update TotalClassAttended after submitting the attendance list
+     updateTotalClassAttended(result.attendanceList);
+     
 });
 
 // //Final version
