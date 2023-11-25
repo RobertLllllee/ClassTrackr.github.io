@@ -668,7 +668,72 @@ app.post('/getTotalClassAttended', async (req, res) => {
   }
 });
 
+async function getStudentTotalClasses(studentId) {
+  try {
+    const studentCollection = client.db("Entities").collection("Student");
+
+    const student = await studentCollection.findOne({ StudentID: studentId });
+
+    if (student && student.StudentCurSem) {
+      const subjectCollection = client.db("Entities").collection("Subject");
+      const subjectsData = await subjectCollection.findOne({ semester: student.StudentCurSem });
+
+      if (subjectsData && subjectsData.subjects && subjectsData.subjects.length > 0) {
+        return calculateTotalClasses(subjectsData.subjects);
+      } else {
+        console.error('Subjects not found for the current semester:', student.StudentCurSem);
+        return null;
+      }
+    } else {
+      console.error('Student not found or missing current semester information.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching student TotalClasses:', error);
+    return null;
+  }
+}
+
+// Add this helper function to calculate TotalClasses
+function calculateTotalClasses(subjects) {
+  let totalClasses = 0;
+
+  subjects.forEach(subject => {
+    totalClasses += subject.daysPerWeek * subject.weeks;
+  });
+
+  return totalClasses;
+}
+
+// Add this route to your server.js
+app.post('/updateTotalClasses', async (req, res) => {
+  try {
+    const { studentId } = req.body;
+
+    const totalClasses = await getStudentTotalClasses(studentId);
+
+    if (totalClasses !== null) {
+      const result = await req.dbClient.db("Entities").collection("Student").updateOne(
+        { StudentID: studentId },
+        { $set: { TotalClasses: totalClasses } }
+      );
+
+      if (result.modifiedCount > 0) {
+        res.json({ success: true, message: 'TotalClasses updated successfully', totalClasses });
+      } else {
+        res.json({ success: false, message: 'TotalClasses not updated' });
+      }
+    } else {
+      res.json({ success: false, message: 'Error calculating TotalClasses or student not found' });
+    }
+  } catch (error) {
+    console.error('Error updating TotalClasses:', error);
+    res.status(500).json({ success: false, message: 'Error updating TotalClasses' });
+  }
+});
+
 app.listen(5500, () => console.log('Server Started!'));
+
 // client.connect()
 //     .then(() => {
 //         db = client.db('Entities');
