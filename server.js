@@ -648,6 +648,26 @@ app.post('/submitAbsenceForm', async (req, res) => {
   }
 });
 
+app.post('/getTotalClassAttended', async (req, res) => {
+  try {
+    const studentId = req.body.studentId;
+
+    const studentCollection = req.dbClient.db("Entities").collection("Student");
+
+    // Find the student by StudentID
+    const student = await studentCollection.findOne({ StudentID: studentId });
+
+    if (student) {
+      res.json({ success: true, totalClassAttended: student.TotalClassAttended });
+    } else {
+      res.json({ success: false, message: 'Student not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching TotalClassAttended:', error);
+    res.status(500).json({ success: false, message: 'Error fetching TotalClassAttended' });
+  }
+});
+
 app.listen(5500, () => console.log('Server Started!'));
 // client.connect()
 //     .then(() => {
