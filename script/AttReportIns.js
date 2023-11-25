@@ -41,6 +41,10 @@ async function displayAttendanceData(data) {
             const th = document.createElement('th');
             th.textContent = 'Student Names';
             headerRow.appendChild(th);
+
+            const thStatus = document.createElement('th');
+            thStatus.textContent = 'Status';
+            headerRow.appendChild(thStatus);
             continue;
         }
         const th = document.createElement('th');
@@ -53,18 +57,24 @@ async function displayAttendanceData(data) {
         const row = table.insertRow();
         for (const key in entry) {
             if (key === 'students') {
-                const cell = row.insertCell();
+                const cellNames = row.insertCell();
+                const cellStatus = row.insertCell();
+
                 const studentsArray = entry[key];
 
-                // Fetch and display student names
-                const studentNames = await Promise.all(studentsArray.map(async student => {
+                // Fetch and display student names and status
+                const studentDetails = await Promise.all(studentsArray.map(async student => {
                     const studentId = student.studentId;
                     const studentNameResponse = await fetch(`http://localhost:5500/fetchStudentName?studentId=${studentId}`);
                     const studentNameData = await studentNameResponse.json();
-                    return `${studentNameData.success ? studentNameData.studentName : 'Student not found'} (${student.status})`;
+                    return {
+                        name: studentNameData.success ? studentNameData.studentName : 'Student not found',
+                        status: student.status
+                    };
                 }));
 
-                cell.textContent = studentNames.join(', ');
+                cellNames.textContent = studentDetails.map(detail => detail.name).join(', ');
+                cellStatus.textContent = studentDetails.map(detail => detail.status).join(', ');
             } else {
                 const cell = row.insertCell();
                 cell.textContent = entry[key];
