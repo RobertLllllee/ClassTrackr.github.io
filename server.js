@@ -870,6 +870,40 @@ app.post('/admin/modifyAttendance', async (req, res) => {
   }
 });
 
+app.get('/fetchStudentAttendanceRate', async (req, res) => {
+  try {
+    const collection = client.db("Entities").collection("Student");
+
+    // Fetch data from MongoDB
+    const students = await collection.find().toArray();
+
+    // Extract required fields and create an array of objects
+    const studentDetails = students.map(student => ({
+      studentId: student.StudentID,
+      studentName: student.StudentName,
+      studentCurSem: student.StudentCurSem,
+      attendanceRate: student.AttendanceRate,
+    }));
+
+    // Sorting functionality
+    const { sortBy, sortOrder } = req.query;
+
+    if (sortBy && sortOrder) {
+      // Sort the array based on the provided parameters
+      studentDetails.sort((a, b) => {
+        const comparison = a[sortBy].localeCompare(b[sortBy]);
+
+        return sortOrder === 'asc' ? comparison : -comparison;
+      });
+    }
+
+    res.json({ success: true, studentDetails });
+  } catch (error) {
+    console.error('Error fetching student details:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 app.listen(5500, () => console.log('Server Started!'));
 
 // client.connect()

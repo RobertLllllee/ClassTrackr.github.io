@@ -20,3 +20,6 @@ function AttendanceReport() {
   window.location.href = 'AttReport.html';
 }
 
+function checkAttendanceRate(){
+  window.location.href = 'checkAttrate.html';
+}
