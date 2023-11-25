@@ -36,15 +36,16 @@ async function displayAttendanceData(data) {
     // Create table header
     const headerRow = table.insertRow();
     for (const key in data[0]) {
-        if (key === 'students') {
-            // If the key is 'students', handle it separately
+        if (key === 'studentsData') {
+            // If the key is 'studentsData', handle it separately
             const th = document.createElement('th');
             th.textContent = 'Student Names';
             headerRow.appendChild(th);
 
-            const thStatus = document.createElement('th');
-            thStatus.textContent = 'Status';
-            headerRow.appendChild(thStatus);
+            const statusTh = document.createElement('th');
+            statusTh.textContent = 'Status';
+            headerRow.appendChild(statusTh);
+
             continue;
         }
         const th = document.createElement('th');
@@ -56,25 +57,33 @@ async function displayAttendanceData(data) {
     data.forEach(async entry => {
         const row = table.insertRow();
         for (const key in entry) {
-            if (key === 'students') {
-                const cellNames = row.insertCell();
-                const cellStatus = row.insertCell();
+            if (key === 'studentsData') {
+                const cell = row.insertCell();
+                const statusCell = row.insertCell();
 
                 const studentsArray = entry[key];
 
-                // Fetch and display student names and status
-                const studentDetails = await Promise.all(studentsArray.map(async student => {
+                // Fetch and display student names and statuses
+                const studentData = await Promise.all(studentsArray.map(async student => {
                     const studentId = student.studentId;
+
+                    // Fetch student name
                     const studentNameResponse = await fetch(`http://localhost:5500/fetchStudentName?studentId=${studentId}`);
                     const studentNameData = await studentNameResponse.json();
+
+                    // Construct the display string
                     return {
                         name: studentNameData.success ? studentNameData.studentName : 'Student not found',
                         status: student.status
                     };
                 }));
 
-                cellNames.textContent = studentDetails.map(detail => detail.name).join(', ');
-                cellStatus.textContent = studentDetails.map(detail => detail.status).join(', ');
+                // Separate student names and statuses
+                const studentNames = studentData.map(student => student.name).join(', ');
+                const statuses = studentData.map(student => student.status).join(', ');
+
+                cell.textContent = studentNames;
+                statusCell.textContent = statuses;
             } else {
                 const cell = row.insertCell();
                 cell.textContent = entry[key];

@@ -326,7 +326,7 @@ function generateQRCode(studentId) {
     const subject = document.getElementById("subject").value;
 
     // Retrieve the instructor's name from localStorage or session variable
-    const instructor = localStorage.getItem("instructorName") || "DefaultInstructor";
+    const instructor = localStorage.getItem("instructorName") || "YourInstructorName"; // Update this line
 
     const customFormat = generateCustomFormat();
     const qrText = `${date} - ${timeslot} - ${subject} - ${customFormat}`;
@@ -345,7 +345,7 @@ function generateQRCode(studentId) {
         timeslot,
         subject,
         instructor,
-        customFormat
+        customFormat,
     };
     localStorage.setItem("generatedDetails", JSON.stringify(details));
 
@@ -480,7 +480,9 @@ document.getElementById("saveSubmitButton").addEventListener("click", async () =
     const timeslot = document.getElementById("timeslot").value;
     const semester = document.getElementById("semester").value;
     const subject = document.getElementById("subject").value;
-    const instructorName = "Instructor Name"; // Replace with the actual instructor name
+
+    // Retrieve the instructor's name from localStorage
+    const instructorName = localStorage.getItem("instructorName") || "YourInstructorName"; // Update this line
 
     const studentsData = [];
 
@@ -540,10 +542,6 @@ document.getElementById("saveSubmitButton").addEventListener("click", async () =
         console.error("Error updating data:", error);
         // Display an error message or take any other action as needed
     }
-
-     // Update TotalClassAttended after submitting the attendance list
-     updateTotalClassAttended(result.attendanceList);
-     
 });
 
 // //Final version

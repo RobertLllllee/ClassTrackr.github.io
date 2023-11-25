@@ -156,5 +156,9 @@ document.getElementById('sidebar-toggle-btn').addEventListener('click', function
     document.getElementById('currentTime').textContent = formattedTime;
   }
   
+  function redirecttocodeinsert() {
+    window.location.href = 'attendancecode.html'
+  }
+
   setInterval(updateCurrentTime, 1000);
   updateCurrentTime();

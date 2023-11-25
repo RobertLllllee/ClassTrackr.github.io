@@ -448,55 +448,53 @@ app.post('/modifyAttendanceStatus', async (req, res) => {
 });
 
 app.post('/updateModifiedAttendance', async (req, res) => {
+  const { date, timeslot, semester, subject, instructorName, studentsData } = req.body;
+
   try {
-      const { date, timeslot, semester, subject, instructorName, studentsData } = req.body;
+      const attendanceCollection = client.db("Entities").collection('Attendance');
 
-      // Your logic to update the Attendance collection with modified statuses
-      // This will depend on your database schema and how you store attendance data
-
-      // For demonstration purposes, let's assume you have an Attendance collection
-      // with fields: date, timeslot, semester, subject, instructorName, students
-
-      const collection = client.db("Entities").collection("Attendance");
-
-      // Check if the record already exists for the specified date and timeslot
-      const existingRecord = await collection.findOne({
+      // Check if the record already exists
+      const existingRecord = await attendanceCollection.findOne({
           date,
           timeslot,
+          subject,
+          instructorName,
+          semester,
       });
 
       if (existingRecord) {
-          // Update the existing record
-          await collection.updateOne(
+          // Update existing record
+          await attendanceCollection.updateOne(
               {
                   date,
                   timeslot,
+                  subject,
+                  instructorName,
+                  semester,
               },
               {
                   $set: {
-                      semester,
-                      subject,
-                      instructorName,
-                      students: studentsData, // Assuming studentsData is an array of student objects
+                      studentsData,
                   },
               }
           );
       } else {
-          // Insert a new record
-          await collection.insertOne({
+          // Insert new record
+          await attendanceCollection.insertOne({
               date,
               timeslot,
               semester,
               subject,
               instructorName,
-              students: studentsData, // Assuming studentsData is an array of student objects
+              studentsData,
           });
       }
 
-      res.json({ success: true, message: 'Attendance updated successfully' });
+      client.close();
+      res.json({ success: true, message: 'Data updated successfully' });
   } catch (error) {
-      console.error('Error updating attendance:', error);
-      res.json({ success: false, message: 'Error updating attendance' });
+      console.error('Error updating data:', error);
+      res.status(500).json({ success: false, message: 'Internal server error' });
   }
 });
 
