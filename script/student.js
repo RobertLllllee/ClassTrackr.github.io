@@ -64,9 +64,9 @@ document.getElementById('sidebar-toggle-btn').addEventListener('click', function
   async function updateTotalClasses() {
     const totalClassesElement = document.getElementById('totalClasses');
     if (totalClassesElement) {
-      // Fetch and update the TotalClasses from your server
+      // Fetch the TotalClasses from your server
       try {
-        const response = await fetch('http://localhost:5500/updateTotalClasses', {
+        const response = await fetch('http://localhost:5500/getTotalClasses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -79,10 +79,10 @@ document.getElementById('sidebar-toggle-btn').addEventListener('click', function
         if (data.success) {
           totalClassesElement.textContent = data.totalClasses;
         } else {
-          console.error('Error updating TotalClasses:', data.message);
+          console.error('Error fetching TotalClasses:', data.message);
         }
       } catch (error) {
-        console.error('Error updating TotalClasses:', error);
+        console.error('Error fetching TotalClasses:', error);
       }
     } else {
       console.error('Element with ID "totalClasses" not found.');

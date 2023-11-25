@@ -732,6 +732,26 @@ app.post('/updateTotalClasses', async (req, res) => {
   }
 });
 
+app.post('/getTotalClasses', async (req, res) => {
+  try {
+    const studentId = req.body.studentId;
+
+    const studentCollection = req.dbClient.db("Entities").collection("Student");
+
+    // Find the student by StudentID
+    const student = await studentCollection.findOne({ StudentID: studentId });
+
+    if (student) {
+      res.json({ success: true, totalClasses: student.TotalClasses });
+    } else {
+      res.json({ success: false, message: 'Student not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching TotalClasses:', error);
+    res.status(500).json({ success: false, message: 'Error fetching TotalClasses' });
+  }
+});
+
 app.listen(5500, () => console.log('Server Started!'));
 
 // client.connect()
