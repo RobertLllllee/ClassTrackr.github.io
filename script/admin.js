@@ -16,3 +16,7 @@ function displayUserDetails() {
   }
 }
 
+function AttendanceReport() {
+  window.location.href = 'AttReport.html';
+}
+

@@ -25,6 +25,6 @@ window.onload = function() {
         window.location.href = 'QR.html';
     }
 
-    function redirectToAttendanceReportPage(){
-      window.location.href = 'AttReportIns.html';
+    function AttendanceReport(){
+      window.location.href = 'AttReport.html';
     }

@@ -800,6 +800,76 @@ app.get('/getAttendanceReport', async (req, res) => {
   }
 });
 
+// Route to modify attendance records for admin
+app.post('/admin/modifyAttendance', async (req, res) => {
+  try {
+      const { studentId, studentName, action, confirmDelete } = req.body;
+
+      // Check if the student exists in the Student collection
+      const studentCollection = client.db("Entities").collection("Student");
+      const existingStudent = await studentCollection.findOne({ StudentID: studentId });
+
+      if (!existingStudent) {
+          return res.json({ success: false, message: 'Student not found in the database.' });
+      }
+
+      // Modify attendance records based on the action
+      const attendanceCollection = client.db("Entities").collection('Attendance');
+
+      if (action === 'add') {
+          // Check if the student is already in the attendance list
+          const existingAttendanceRecord = await attendanceCollection.findOne({
+              'studentsData.studentId': studentId
+          });
+
+          if (existingAttendanceRecord) {
+              return res.json({ success: false, message: 'Student already exists in the attendance list.' });
+          }
+
+          // Add the student to the attendance list
+          await attendanceCollection.updateOne(
+              {},
+              {
+                  $push: {
+                      studentsData: {
+                          studentId: studentId,
+                          status: 'Present', // You can set a default status here
+                      },
+                  },
+              }
+          );
+
+          res.json({ success: true, message: 'Student added to the attendance list successfully.' });
+      } else if (action === 'delete') {
+          // Confirm deletion with admin
+          if (!confirmDelete) {
+              return res.json({ success: false, message: 'Deletion not confirmed.' });
+          }
+
+          // Remove the student from the attendance list
+          const result = await attendanceCollection.updateOne(
+              {},
+              {
+                  $pull: {
+                      studentsData: { studentId: studentId },
+                  },
+              }
+          );
+
+          if (result && result.modifiedCount > 0) {
+              res.json({ success: true, message: 'Student deleted from the attendance list successfully.' });
+          } else {
+              res.json({ success: false, message: 'Failed to delete student from the attendance list.' });
+          }
+      } else {
+          return res.json({ success: false, message: 'Invalid action.' });
+      }
+  } catch (error) {
+      console.error('Error modifying attendance:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 app.listen(5500, () => console.log('Server Started!'));
 
 // client.connect()
