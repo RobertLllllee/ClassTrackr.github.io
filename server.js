@@ -54,12 +54,12 @@ app.use(
 
 app.post('/login', async (req, res) => {
   try {
-    await client.connect();
     let collection;
     let redirectUrl;
     let userId;
     let userName;
     let userPass;
+
     switch (req.body.UserType) {
       case 'Administrator':
         collection = client.db("Entities").collection("Administrator");
@@ -113,6 +113,25 @@ app.post('/login', async (req, res) => {
     res.json({ success: false, message: 'Error occurred' });
   }
 });
+
+app.get('/get-user-info', (req, res) => {
+  try {
+    const userType = req.session.userType;
+    const userId = req.session.userId;
+    const userName = req.session.userName;
+
+    if (!userType || !userId || !userName) {
+      res.status(401).json({ success: false, message: 'Unauthorized' });
+      return;
+    }
+
+    res.json({ success: true, userType, userId, userName });
+  } catch (error) {
+    console.error('Error getting user information:', error);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 
 app.get('/fetchSemesters', async (req, res) => {
   try {
