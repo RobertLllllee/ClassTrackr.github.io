@@ -190,6 +190,15 @@ function createStudentFields(form) {
     form.appendChild(curSemLabel);
     form.appendChild(curSemInput);
     form.appendChild(document.createElement('br'));
+
+    const passLabel = document.createElement('label');
+    passLabel.textContent = 'Student Password:';
+    const passInput = document.createElement('input');
+    passInput.type = 'password';  // Use 'password' type for password input
+    passInput.name = 'StudentPass';  // Corrected field name here
+    form.appendChild(passLabel);
+    form.appendChild(passInput);
+    form.appendChild(document.createElement('br'));
 }
 
 // Function to create additional form fields for instructor data
