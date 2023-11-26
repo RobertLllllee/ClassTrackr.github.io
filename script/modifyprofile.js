@@ -18,7 +18,7 @@ async function performAction() {
 
             if (response.ok) {
                 clearTable(); // Clear existing table
-                displayData(result.data);
+                displayData(result.data, userType); // Pass userType to displayData function
             } else {
                 alert(result.error || 'Error performing action');
             }
@@ -46,75 +46,156 @@ function clearTable() {
 }
 
 // Function to display data
-function displayData(data) {
+function displayData(data, userType) {
     const table = document.createElement('table');
     table.id = 'dataTable';
 
-    // Add header row
-    const headerRow = table.insertRow();
-    for (const key in data[0]) {
-        const headerCell = document.createElement('th');
-        headerCell.textContent = key;
-        headerRow.appendChild(headerCell);
-    }
+    // Define columns based on user type
+    const columns = userType === 'student'
+        ? [
+              { key: 'StudentID', label: 'Student ID' },
+              { key: 'StudentName', label: 'Student Name' },
+              { key: 'StudentEmail', label: 'Student Email' },
+              { key: 'StudentSession', label: 'Student Session' },
+              { key: 'StudentSection', label: 'Student Section' },
+              { key: 'StudentCourse', label: 'Student Course' },
+              { key: 'StudentTel', label: 'Student Telephone' },
+              { key: 'StudentGender', label: 'Student Gender' },
+              { key: 'StudentDOB', label: 'Student Date of Birth' },
+              { key: 'StudentCurSem', label: 'Student Current Semester' },
+              { key: 'TotalClasses', label: 'Total Classes' },
+              { key: 'TotalClassAttended', label: 'Total Classes Attended' },
+              { key: 'AttendanceRate', label: 'Attendance Rate' },
+              { key: 'actions', label: 'Actions' },
+          ]
+        : userType === 'instructor'
+        ? [
+              { key: 'InstructorID', label: 'Instructor ID' },
+              { key: 'InstructorName', label: 'Instructor Name' },
+              { key: 'InstructorEmail', label: 'Instructor Email' },
+              { key: 'InstructorTel', label: 'Instructor Telephone' },
+              { key: 'InstructorGender', label: 'Instructor Gender' },
+              { key: 'InstructorDOB', label: 'Instructor Date of Birth' },
+              { key: 'actions', label: 'Actions' },
+          ]
+        : [];
 
-    // Add data rows
-    for (const item of data) {
-        const dataRow = table.insertRow();
-        for (const key in item) {
-            const cell = dataRow.insertCell();
-            cell.textContent = item[key];
-        }
-    }
-
-    document.body.appendChild(table);
-}
+      // Add header row
+      const headerRow = table.insertRow();
+      columns.forEach((column) => {
+          const headerCell = document.createElement('th');
+          headerCell.textContent = column.label;
+          headerRow.appendChild(headerCell);
+      });
+  
+      // Add data rows
+      for (const item of data) {
+          const dataRow = table.insertRow();
+          columns.forEach((column) => {
+              const cell = dataRow.insertCell();
+              const value = column.key.includes('.')
+                  ? getNestedPropertyValue(item, column.key)
+                  : column.key === 'AttendanceRate'
+                  ? `${item[column.key]}%`
+                  : item[column.key];
+              cell.textContent = value;
+  
+              // Add delete button for each row
+              if (column.key === 'actions') {
+                  const deleteButton = document.createElement('button');
+                  deleteButton.textContent = 'Delete';
+                  deleteButton.addEventListener('click', () => confirmAndDelete(userType, item));
+                  cell.appendChild(deleteButton);
+              }
+          });
+      }
+  
+      document.body.appendChild(table);
+  }
+  
+  // Function to confirm and delete user profile
+  async function confirmAndDelete(userType, profile) {
+      const confirmDelete = confirm('Are you sure you want to delete this profile?');
+  
+      if (confirmDelete) {
+          try {
+              const response = await fetch('http://localhost:5500/admin/actions', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                      action: 'delete',
+                      userType,
+                      profile,
+                  }),
+              });
+  
+              const result = await response.json();
+  
+              if (response.ok) {
+                  alert(result.message || 'Profile deleted successfully');
+                  // Add logic to refresh the table or update the UI
+              } else {
+                  alert(result.error || 'Error deleting profile');
+              }
+          } catch (error) {
+              console.error('Error:', error);
+              alert('Error deleting profile');
+          }
+      }
+  }
 
 // Function to create the initial form for ID, Name, Tel, and Email
 function createForm(userType) {
     // Remove existing form, if any
-    const existingForm = document.getElementById('createForm');
+    const existingForm = document.getElementById('modifyForm');
     if (existingForm) {
         existingForm.remove();
     }
 
+    // Capitalize the first letter of userType
+    const capitalizedUserType = userType.charAt(0).toUpperCase() + userType.slice(1);
+    // Convert userType to lowercase
+    const userTypeLowerCase = userType.toLowerCase();
+
     const form = document.createElement('form');
-    form.id = 'createForm';
-    form.addEventListener('submit', (e) => validateAndSubmit(e, userType));
+    form.id = 'modifyForm';
+    form.addEventListener('submit', (e) => validateAndSubmit(e, userTypeLowerCase));  // Use userTypeLowerCase here
 
     // Create basic fields for ID, Name, Tel, and Email
     const idLabel = document.createElement('label');
-    idLabel.textContent = `${userType === 'student' ? 'Student' : 'Instructor'} ID:`;
+    idLabel.textContent = `${capitalizedUserType} ID:`;
     const idInput = document.createElement('input');
     idInput.type = 'text';
-    idInput.name = `${userType.toLowerCase()}ID`;  // Corrected field name here
+    idInput.name = `${userTypeLowerCase}ID`;  // Use userTypeLowerCase here
     form.appendChild(idLabel);
     form.appendChild(idInput);
     form.appendChild(document.createElement('br'));
 
     const nameLabel = document.createElement('label');
-    nameLabel.textContent = `${userType === 'student' ? 'Student' : 'Instructor'} Name:`;
+    nameLabel.textContent = `${capitalizedUserType} Name:`;
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
-    nameInput.name = `${userType.toLowerCase()}Name`;  // Corrected field name here
+    nameInput.name = `${userTypeLowerCase}Name`;  // Use userTypeLowerCase here
     form.appendChild(nameLabel);
     form.appendChild(nameInput);
     form.appendChild(document.createElement('br'));
 
     const telLabel = document.createElement('label');
-    telLabel.textContent = `${userType === 'student' ? 'Student' : 'Instructor'} Telephone:`;
+    telLabel.textContent = `${capitalizedUserType} Telephone:`;
     const telInput = document.createElement('input');
     telInput.type = 'text';
-    telInput.name = `${userType.toLowerCase()}Tel`;  // Corrected field name here
+    telInput.name = `${userTypeLowerCase}Tel`;  // Use userTypeLowerCase here
     form.appendChild(telLabel);
     form.appendChild(telInput);
     form.appendChild(document.createElement('br'));
 
     const emailLabel = document.createElement('label');
-    emailLabel.textContent = `${userType === 'student' ? 'Student' : 'Instructor'} Email:`;
+    emailLabel.textContent = `${capitalizedUserType} Email:`;
     const emailInput = document.createElement('input');
     emailInput.type = 'text';
-    emailInput.name = `${userType.toLowerCase()}Email`;  // Corrected field name here
+    emailInput.name = `${userTypeLowerCase}Email`;  // Use userTypeLowerCase here
     form.appendChild(emailLabel);
     form.appendChild(emailInput);
     form.appendChild(document.createElement('br'));
@@ -234,10 +315,15 @@ function createInstructorFields(form) {
 async function validateAndSubmit(event, userType) {
     event.preventDefault();
 
-    const id = document.forms['createForm'][`${userType.toLowerCase()}ID`].value;
-    const name = document.forms['createForm'][`${userType.toLowerCase()}Name`].value;
-    const tel = document.forms['createForm'][`${userType.toLowerCase()}Tel`].value;
-    const email = document.forms['createForm'][`${userType.toLowerCase()}Email`].value;
+    // Convert the first letter of userType to uppercase
+    const userTypeUpperCase = userType.charAt(0).toUpperCase() + userType.slice(1);
+
+    // Use the FormData API to get form values
+    const formData = new FormData(document.forms['createForm']);
+    const id = formData.get(`${userTypeUpperCase}ID`);
+    const name = formData.get(`${userTypeUpperCase}Name`);
+    const tel = formData.get(`${userTypeUpperCase}Tel`);
+    const email = formData.get(`${userTypeUpperCase}Email`);
 
     // Validate the provided data
     try {
@@ -250,10 +336,10 @@ async function validateAndSubmit(event, userType) {
                 action: 'validate',
                 userType,
                 profile: {
-                    [`${userType}ID`]: id,
-                    [`${userType}Name`]: name,
-                    [`${userType}Tel`]: tel,
-                    [`${userType}Email`]: email,
+                    [`${userTypeUpperCase}ID`]: id,
+                    [`${userTypeUpperCase}Name`]: name,
+                    [`${userTypeUpperCase}Tel`]: tel,
+                    [`${userTypeUpperCase}Email`]: email,
                 },
             }),
         });
