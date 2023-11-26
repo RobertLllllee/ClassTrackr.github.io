@@ -185,55 +185,31 @@ function clearTable() {
       existingTable.remove();
     }
 }
-  
+
 function displayData(data) {
     const table = document.createElement('table');
     table.id = 'dataTable';
   
-    // Assuming the data is an array of objects
-    if (data.length > 0) {
-      // Create header row
-      const headerRow = table.insertRow();
-      for (const key in data[0]) {
-        const cell = headerRow.insertCell();
-        cell.appendChild(document.createTextNode(key));
-      }
+    // Add header row
+    const headerRow = table.insertRow();
+    for (const key in data[0]) {
+      const headerCell = document.createElement('th');
+      headerCell.textContent = key;
+      headerRow.appendChild(headerCell);
+    }
   
-      // Create data rows
-      for (const item of data) {
-        const row = table.insertRow();
-        for (const key in item) {
-          const cell = row.insertCell();
-  
-          // Check if the current key corresponds to a date field (ending with "DOB")
-          if (key.endsWith('DOB')) {
-            // Format the date and set the cell content
-            cell.appendChild(document.createTextNode(formatDOB(item[key])));
-          } else {
-            // For other fields, directly set the cell content
-            cell.appendChild(document.createTextNode(item[key]));
-          }
-        }
+    // Add data rows
+    for (const item of data) {
+      const dataRow = table.insertRow();
+      for (const key in item) {
+        const cell = dataRow.insertCell();
+        cell.textContent = item[key];
       }
     }
   
     document.body.appendChild(table);
-}
+  }
   
-// Function to format date of birth
-function formatDOB(dobArray) {
-    if (!Array.isArray(dobArray) || dobArray.length === 0) {
-      return ''; // Handle empty or invalid data
-    }
-  
-    const dobObject = dobArray[0];
-    const year = dobObject?.Year || '';
-    const month = dobObject?.Month || '';
-    const day = dobObject?.Day || '';
-  
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-}
-
 function createForm(userType) {
     // Remove existing form, if any
     const existingForm = document.getElementById('createForm');
@@ -343,7 +319,7 @@ async function validateAndSubmit(event, userType) {
     }
 }
 
-  function createAdditionalStudentForm() {
+function createAdditionalStudentForm() {
     const form = document.createElement('form');
     form.addEventListener('submit', (e) => validateAndSubmit(e, 'student'));
   

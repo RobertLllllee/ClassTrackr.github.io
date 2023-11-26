@@ -901,8 +901,52 @@ app.post('/admin/actions', async (req, res) => {
         const collectionName = userType === 'student' ? 'Student' : 'Instructor';
         const collection = req.dbClient.db('Entities').collection(collectionName);
 
-        // Exclude _id from the profileData
+        // Existing create logic
         await collection.insertOne({ ...profile, _id: undefined });
+
+        // Add additional fields based on user type
+        if (userType === 'student') {
+          // Assuming profile['StudentDOB'] is an array with the expected structure
+          const studentDOB = profile['StudentDOB'] && profile['StudentDOB'][0];
+          
+          // Set default values for additional fields
+          const additionalFields = {
+            TotalClasses: 0,
+            TotalClassAttended: 0,
+            AttendanceRate: 0.0,
+            StudentSession: profile.StudentSession || '',
+            StudentSection: profile.StudentSection || '',
+            StudentCourse: profile.StudentCourse || '',
+            StudentGender: profile.StudentGender || '',
+            StudentPass: profile.StudentPass || '',
+            Year: studentDOB ? studentDOB.Year : '',
+            Month: studentDOB ? studentDOB.Month : '',
+            Day: studentDOB ? studentDOB.Day : '',
+            StudentCurSem: profile.StudentCurSem || '',
+          };
+
+          // Update the document with additional fields
+          await collection.updateOne({ _id: profile._id }, { $set: additionalFields });
+        } else if (userType === 'instructor') {
+          // Assuming profile['InstructorDOB'] is an array with the expected structure
+          const instructorDOB = profile['InstructorDOB'] && profile['InstructorDOB'][0];
+
+          // Set default values for additional fields
+          const additionalFields = {
+            TotalClasses: 0,
+            TotalClassAttended: 0,
+            AttendanceRate: 0.0,
+            InstructorPass: profile.InstructorPass || '',
+            InstructorGender: profile.InstructorGender || '',
+            Year: instructorDOB ? instructorDOB.Year : '',
+            Month: instructorDOB ? instructorDOB.Month : '',
+            Day: instructorDOB ? instructorDOB.Day : '',
+          };
+
+          // Update the document with additional fields
+          await collection.updateOne({ _id: profile._id }, { $set: additionalFields });
+        }
+
         res.json({ success: true, message: 'Profile created successfully' });
       } else {
         res.status(400).json({ error: 'Invalid user type' });
@@ -917,19 +961,7 @@ app.post('/admin/actions', async (req, res) => {
 
         const profiles = await collection.find({}, { projection }).toArray();
 
-        // Format the date of birth before sending the response
-        const formattedProfiles = profiles.map(profile => {
-          const formattedProfile = { ...profile };
-
-          // Check and format date fields
-          if (formattedProfile[`${userType}DOB`] && Array.isArray(formattedProfile[`${userType}DOB`])) {
-            formattedProfile[`${userType}DOB`] = formatDOB(formattedProfile[`${userType}DOB`]);
-          }
-
-          return formattedProfile;
-        });
-
-        res.json({ success: true, data: formattedProfiles });
+        res.json({ success: true, data: profiles });
       } else {
         res.status(400).json({ error: 'Invalid user type' });
       }
@@ -965,20 +997,6 @@ app.post('/admin/actions', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
-
-// Function to format date of birth
-function formatDOB(dobArray) {
-  if (!Array.isArray(dobArray) || dobArray.length === 0) {
-    return ''; // Handle empty or invalid data
-  }
-
-  const dobObject = dobArray[0];
-  const year = dobObject?.Year || '';
-  const month = dobObject?.Month || '';
-  const day = dobObject?.Day || '';
-
-  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-}
 
 app.listen(5500, () => console.log('Server Started!'));
 
