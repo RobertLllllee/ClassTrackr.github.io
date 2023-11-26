@@ -1,3 +1,5 @@
+// Initial setup - add an event listener for the 'Perform Action' button
+document.getElementById('performActionButton').addEventListener('click', performAction);
 // Function to perform actions
 async function performAction() {
     const userType = document.getElementById('userType').value;
@@ -66,7 +68,6 @@ function displayData(data, userType) {
               { key: 'TotalClasses', label: 'Total Classes' },
               { key: 'TotalClassAttended', label: 'Total Classes Attended' },
               { key: 'AttendanceRate', label: 'Attendance Rate' },
-              { key: 'actions', label: 'Actions' },
           ]
         : userType === 'instructor'
         ? [
@@ -76,7 +77,6 @@ function displayData(data, userType) {
               { key: 'InstructorTel', label: 'Instructor Telephone' },
               { key: 'InstructorGender', label: 'Instructor Gender' },
               { key: 'InstructorDOB', label: 'Instructor Date of Birth' },
-              { key: 'actions', label: 'Actions' },
           ]
         : [];
 
@@ -356,5 +356,4 @@ async function submitData(userType) {
     }
 }
 
-// Initial setup - add an event listener for the 'Perform Action' button
-document.getElementById('performActionButton').addEventListener('click', performAction);
+

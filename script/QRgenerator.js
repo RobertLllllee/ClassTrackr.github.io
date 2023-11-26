@@ -79,7 +79,7 @@ async function fetchSemesters() {
     }
 }
 
-// Ensure to call fetchSemesters to initialize the semesters dropdown
+// // Ensure to call fetchSemesters to initialize the semesters dropdown
 // fetchSemesters();
 
 populateTimeslots();

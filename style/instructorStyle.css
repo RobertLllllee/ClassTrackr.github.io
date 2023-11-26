@@ -1,6 +1,7 @@
 /* import google fonts */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700");
 
+/* Reset and base styles */
 * {
   margin: 0;
   padding: 0;
@@ -11,48 +12,54 @@
   font-family: "Poppins", sans-serif;
 }
 
-body {
-  background: #ebe9e9; /* Updated color */
+/* Colors */
+:root {
+  --background: #EBE9E9;
+  --container-bg: #F3F8F2;
+  --nav-bg: #FCB07E;
+  --nav-text: #DEE2D6;
+  --nav-hover: #eee;
+  --dashboard-bg: #F3F8F2;
+  --button-bg: #3581B8;
+  --button-text: #DEE2D6;
+  --box-bg: #F3F8F2;
+  --box-shadow: rgba(0, 0, 0, 0.1);
+  --course-bg: #DEE2D6;
+  --box-hover: rgba(0, 0, 0, 0.842);
 }
 
+/* Body styles */
+body {
+  background: var(--background);
+}
+
+/* Container styles */
 .container {
   display: flex;
+  min-height: 100vh;
 }
 
+/* Navigation styles */
 nav {
   position: relative;
   top: 0;
   bottom: 0;
   height: 100vh;
   left: 0;
-  background: #fff;
+  background: var(--nav-bg);
   width: 280px;
   overflow: hidden;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 35px var(--box-shadow);
 }
 
-.logo {
-  text-align: center;
-  display: flex;
-  margin: 10px 0 0 10px;
+nav ul {
+  list-style: none;
+  padding-top: 10px;
 }
 
-.logo img {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-}
-
-.logo span {
-  font-weight: bold;
-  padding-left: 15px;
-  font-size: 18px;
-  text-transform: uppercase;
-}
-
-a {
+nav a {
   position: relative;
-  color: #3581b8; 
+  color: var(--nav-text);
   font-size: 14px;
   display: table;
   width: 280px;
@@ -68,41 +75,64 @@ nav .fas {
   text-align: center;
 }
 
-.nav-item {
-  position: relative;
-  top: 12px;
-  margin-left: 10px;
+nav a:hover {
+  background: var(--nav-hover);
 }
 
-a:hover {
-  background: #eee;
+nav .logo {
+  text-align: center;
+  display: flex;
+  margin: 10px 0 0 10px;
 }
 
-.logout {
-  position: absolute;
-  bottom: 0;
+nav .logo img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
 }
 
-/* Main Section */
+nav .logo span {
+  font-weight: bold;
+  padding-left: 15px;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+/* Dashboard styles */
+.dashboard {
+  flex-grow: 1;
+  background: var(--dashboard-bg);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* User Info styles */
+#userInfo {
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--box-shadow);
+}
+
+/* Button styles */
+.buttongenerateQR button {
+  background: var(--button-bg);
+  color: var(--button-text);
+  padding: 7px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* Main Section styles */
 .main {
   position: relative;
   padding: 20px;
   width: 100%;
 }
 
-.main-top {
-  display: flex;
-  width: 100%;
-}
-
-.main-top i {
-  position: absolute;
-  right: 0;
-  margin: 10px 30px;
-  color: rgb(110, 109, 109);
-  cursor: pointer;
-}
-
+/* Main Skills styles */
 .main-skills {
   display: flex;
   margin-top: 20px;
@@ -115,21 +145,12 @@ a:hover {
   text-align: center;
   border-radius: 20px;
   padding: 10px;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-}
-
-.main-skills .card h3 {
-  margin: 10px;
-  text-transform: capitalize;
-}
-
-.main-skills .card p {
-  font-size: 12px;
+  box-shadow: 0 20px 35px var(--box-shadow);
 }
 
 .main-skills .card button {
-  background: #3581b8; /* Updated color */
-  color: #fff;
+  background: var(--button-bg);
+  color: var(--button-text);
   padding: 7px 15px;
   border-radius: 10px;
   margin-top: 15px;
@@ -137,15 +158,10 @@ a:hover {
 }
 
 .main-skills .card button:hover {
-  background: rgba(223, 70, 15, 0.856);
+  background: var(--box-hover);
 }
 
-.main-skills .card i {
-  font-size: 22px;
-  padding: 10px;
-}
-
-/* Courses */
+/* Courses styles */
 .main-course {
   margin-top: 20px;
   text-transform: capitalize;
@@ -156,9 +172,9 @@ a:hover {
   height: 300px;
   padding: 10px 10px 30px 10px;
   margin-top: 10px;
-  background: #dee2d6; /* Updated color */
+  background: var(--course-bg);
   border-radius: 10px;
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 35px var(--box-shadow);
 }
 
 .course-box ul {
@@ -186,13 +202,8 @@ a:hover {
   padding: 10px;
   margin: 10px;
   border-radius: 10px;
-  background: #f3f8f2; /* Updated color */
-  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
-}
-
-.box p {
-  font-size: 12px;
-  margin-top: 5px;
+  background: var(--box-bg);
+  box-shadow: 0 20px 35px var(--box-shadow);
 }
 
 .box button {
@@ -205,7 +216,7 @@ a:hover {
 }
 
 .box button:hover {
-  background: rgba(0, 0, 0, 0.842);
+  background: var(--box-hover);
 }
 
 .box i {
@@ -214,6 +225,7 @@ a:hover {
   margin: -20px 20px 20px 0;
 }
 
+/* Skill colors */
 .html {
   color: rgb(25, 94, 54);
 }
