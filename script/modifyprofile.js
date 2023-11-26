@@ -37,34 +37,6 @@ async function performAction() {
     }
 }
 
-async function deleteProfile(userType, profile) {
-    try {
-        const response = await fetch('http://localhost:5500/admin/actions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                action: 'delete',
-                userType,
-                profile,
-            }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message || 'Profile deleted successfully');
-            // Add logic to refresh the table or update the UI
-        } else {
-            alert(result.error || 'Error deleting profile');
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error deleting profile');
-    }
-}
-
 // Function to clear existing table
 function clearTable() {
     const existingTable = document.querySelector('table');

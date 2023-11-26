@@ -954,33 +954,7 @@ app.post('/admin/actions', async (req, res) => {
           } else {
               res.json({ valid: true, message: 'Validation successful' });
           }
-      } else if (action === 'delete') {
-        if (userType === 'student' || userType === 'instructor') {
-          // Assuming the identifier is in the '_id' field
-          const identifier = profile._id;
-          const collectionName = userType === 'student' ? 'Student' : 'Instructor';
-          const collection = req.dbClient.db('Entities').collection(collectionName);
-
-          try {
-              // Perform the deletion
-              await collection.deleteOne({ _id: identifier });
-
-              // Assuming there is a related data collection (e.g., User Data)
-              // You need to replace 'UserData' with the actual related collection name
-              const relatedCollection = req.dbClient.db('Entities').collection('UserData');
-              await relatedCollection.deleteOne({ [`${userType}ID`]: profile[`${userType}ID`] });
-
-              res.json({ success: true, message: 'Profile deleted successfully' });
-          } catch (error) {
-              console.error('Error:', error);
-              res.status(500).json({ error: 'Error deleting data' });
-          }
-      } else {
-          res.status(400).json({ error: 'Invalid user type' });
-      }
-  } else {
-      res.status(400).json({ error: 'Invalid action' });
-  }
+      } 
 } catch (error) {
   console.error('Error:', error);
   res.status(500).json({ error: 'Internal Server Error' });

@@ -32,3 +32,8 @@ window.onload = function() {
     function checkAttendanceRate(){
       window.location.href = 'checkAttrate.html';
     }
+
+    function redirectprofile() {
+      window.location.href = 'profile.html';
+    }
+
