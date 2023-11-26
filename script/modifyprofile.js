@@ -287,6 +287,13 @@ async function submitData(userType) {
         userType: userType,
     };
 
+    // Add logic to set default values for student profile fields
+    if (userType === 'student') {
+        additionalData.TotalClasses = 0;
+        additionalData.TotalClassAttended = 0;
+        additionalData.AttendanceRate = 0.0;
+    }
+
     try {
         const response = await fetch('http://localhost:5500/admin/actions', {
             method: 'POST',
