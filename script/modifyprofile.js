@@ -37,6 +37,34 @@ async function performAction() {
     }
 }
 
+async function deleteProfile(userType, profile) {
+    try {
+        const response = await fetch('http://localhost:5500/admin/actions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                action: 'delete',
+                userType,
+                profile,
+            }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message || 'Profile deleted successfully');
+            // Add logic to refresh the table or update the UI
+        } else {
+            alert(result.error || 'Error deleting profile');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting profile');
+    }
+}
+
 // Function to clear existing table
 function clearTable() {
     const existingTable = document.querySelector('table');
@@ -88,114 +116,68 @@ function displayData(data, userType) {
           headerRow.appendChild(headerCell);
       });
   
-      // Add data rows
       for (const item of data) {
-          const dataRow = table.insertRow();
-          columns.forEach((column) => {
-              const cell = dataRow.insertCell();
-              const value = column.key.includes('.')
-                  ? getNestedPropertyValue(item, column.key)
-                  : column.key === 'AttendanceRate'
-                  ? `${item[column.key]}%`
-                  : item[column.key];
-              cell.textContent = value;
-  
-              // Add delete button for each row
-              if (column.key === 'actions') {
-                  const deleteButton = document.createElement('button');
-                  deleteButton.textContent = 'Delete';
-                  deleteButton.addEventListener('click', () => confirmAndDelete(userType, item));
-                  cell.appendChild(deleteButton);
-              }
-          });
-      }
+        const dataRow = table.insertRow();
+        columns.forEach((column) => {
+            const cell = dataRow.insertCell();
+            const value = column.key.includes('.')
+                ? getNestedPropertyValue(item, column.key)
+                : column.key === 'AttendanceRate'
+                ? `${item[column.key]}%`
+                : item[column.key];
+            cell.textContent = value;
+
+        });
+    }
   
       document.body.appendChild(table);
-  }
-  
-  // Function to confirm and delete user profile
-  async function confirmAndDelete(userType, profile) {
-      const confirmDelete = confirm('Are you sure you want to delete this profile?');
-  
-      if (confirmDelete) {
-          try {
-              const response = await fetch('http://localhost:5500/admin/actions', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                      action: 'delete',
-                      userType,
-                      profile,
-                  }),
-              });
-  
-              const result = await response.json();
-  
-              if (response.ok) {
-                  alert(result.message || 'Profile deleted successfully');
-                  // Add logic to refresh the table or update the UI
-              } else {
-                  alert(result.error || 'Error deleting profile');
-              }
-          } catch (error) {
-              console.error('Error:', error);
-              alert('Error deleting profile');
-          }
-      }
   }
 
 // Function to create the initial form for ID, Name, Tel, and Email
 function createForm(userType) {
     // Remove existing form, if any
-    const existingForm = document.getElementById('modifyForm');
+    const existingForm = document.getElementById('createForm');
     if (existingForm) {
         existingForm.remove();
     }
 
-    // Capitalize the first letter of userType
-    const capitalizedUserType = userType.charAt(0).toUpperCase() + userType.slice(1);
-    // Convert userType to lowercase
-    const userTypeLowerCase = userType.toLowerCase();
-
     const form = document.createElement('form');
-    form.id = 'modifyForm';
-    form.addEventListener('submit', (e) => validateAndSubmit(e, userTypeLowerCase));  // Use userTypeLowerCase here
+    form.id = 'createForm';
+    form.addEventListener('submit', (e) => validateAndSubmit(e, userType));
 
     // Create basic fields for ID, Name, Tel, and Email
     const idLabel = document.createElement('label');
-    idLabel.textContent = `${capitalizedUserType} ID:`;
+    idLabel.textContent = `${userType.charAt(0).toUpperCase()}${userType.slice(1)} ID:`;
     const idInput = document.createElement('input');
     idInput.type = 'text';
-    idInput.name = `${userTypeLowerCase}ID`;  // Use userTypeLowerCase here
+    idInput.name = `${userType.charAt(0).toUpperCase()}${userType.slice(1)}ID`; // Change input name
     form.appendChild(idLabel);
     form.appendChild(idInput);
     form.appendChild(document.createElement('br'));
 
     const nameLabel = document.createElement('label');
-    nameLabel.textContent = `${capitalizedUserType} Name:`;
+    nameLabel.textContent = `${userType.charAt(0).toUpperCase()}${userType.slice(1)} Name:`;
     const nameInput = document.createElement('input');
     nameInput.type = 'text';
-    nameInput.name = `${userTypeLowerCase}Name`;  // Use userTypeLowerCase here
+    nameInput.name = `${userType.charAt(0).toUpperCase()}${userType.slice(1)}Name`; // Change input name
     form.appendChild(nameLabel);
     form.appendChild(nameInput);
     form.appendChild(document.createElement('br'));
 
     const telLabel = document.createElement('label');
-    telLabel.textContent = `${capitalizedUserType} Telephone:`;
+    telLabel.textContent = `${userType.charAt(0).toUpperCase()}${userType.slice(1)} Telephone:`;
     const telInput = document.createElement('input');
     telInput.type = 'text';
-    telInput.name = `${userTypeLowerCase}Tel`;  // Use userTypeLowerCase here
+    telInput.name = `${userType.charAt(0).toUpperCase()}${userType.slice(1)}Tel`; // Change input name
     form.appendChild(telLabel);
     form.appendChild(telInput);
     form.appendChild(document.createElement('br'));
 
     const emailLabel = document.createElement('label');
-    emailLabel.textContent = `${capitalizedUserType} Email:`;
+    emailLabel.textContent = `${userType.charAt(0).toUpperCase()}${userType.slice(1)} Email:`;
     const emailInput = document.createElement('input');
     emailInput.type = 'text';
-    emailInput.name = `${userTypeLowerCase}Email`;  // Use userTypeLowerCase here
+    emailInput.name = `${userType.charAt(0).toUpperCase()}${userType.slice(1)}Email`; // Change input name
     form.appendChild(emailLabel);
     form.appendChild(emailInput);
     form.appendChild(document.createElement('br'));
@@ -315,15 +297,10 @@ function createInstructorFields(form) {
 async function validateAndSubmit(event, userType) {
     event.preventDefault();
 
-    // Convert the first letter of userType to uppercase
-    const userTypeUpperCase = userType.charAt(0).toUpperCase() + userType.slice(1);
-
-    // Use the FormData API to get form values
-    const formData = new FormData(document.forms['createForm']);
-    const id = formData.get(`${userTypeUpperCase}ID`);
-    const name = formData.get(`${userTypeUpperCase}Name`);
-    const tel = formData.get(`${userTypeUpperCase}Tel`);
-    const email = formData.get(`${userTypeUpperCase}Email`);
+    const id = document.forms['createForm'][`${userType.charAt(0).toUpperCase()}${userType.slice(1)}ID`]?.value;
+    const name = document.forms['createForm'][`${userType.charAt(0).toUpperCase()}${userType.slice(1)}Name`]?.value;
+    const tel = document.forms['createForm'][`${userType.charAt(0).toUpperCase()}${userType.slice(1)}Tel`]?.value;
+    const email = document.forms['createForm'][`${userType.charAt(0).toUpperCase()}${userType.slice(1)}Email`]?.value;
 
     // Validate the provided data
     try {
@@ -336,10 +313,10 @@ async function validateAndSubmit(event, userType) {
                 action: 'validate',
                 userType,
                 profile: {
-                    [`${userTypeUpperCase}ID`]: id,
-                    [`${userTypeUpperCase}Name`]: name,
-                    [`${userTypeUpperCase}Tel`]: tel,
-                    [`${userTypeUpperCase}Email`]: email,
+                    [`${userType}ID`]: id,
+                    [`${userType}Name`]: name,
+                    [`${userType}Tel`]: tel,
+                    [`${userType}Email`]: email,
                 },
             }),
         });
@@ -370,7 +347,7 @@ async function submitData(userType) {
     // Create an object from form data and add userType field
     const additionalData = {
         ...Object.fromEntries(formData.entries()),
-        userType: userType,
+        userType: userType.charAt(0).toUpperCase() + userType.slice(1), // Ensure userType is capitalized
     };
 
     // Add logic to set default values for student profile fields
