@@ -39,3 +39,11 @@ function AttendanceReport() {
 function checkAttendanceRate() {
   window.location.href = 'checkAttrate.html';
 }
+
+function tomodifyprofile() {
+  window.location.href = 'modifyprofile.html';
+}
+
+function redirectprofile() {
+  window.location.href = 'profile.html';
+}
