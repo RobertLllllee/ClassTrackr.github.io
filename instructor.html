@@ -1,32 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <link rel="stylesheet" href="style/instructorStyle.css">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
     <title>Instructor Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="style\instructorStyle.css">
+    <style>
+        /* Add any additional styles here */
+    </style>
 </head>
 <body>
-    <div class="dashboard">
-        <h1>Welcome to the Instructor Dashboard</h1>
-        <div id="userInfo">
-            <p>User Type: <span id="userType"></span></p>
-            <p>User ID: <span id="userID"></span></p>
-            <p>User Name: <span id="userName"></span></p>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="img\logo.png" alt="">
+                <span class="website-name">ClassTrackr</span>
+            </div>
+            <ul class="menu">
+                <li><a href="instructor.html"><i class="fas fa-home"></i>Home</a></li>
+                <li><a href="AttReport.html"><i class="fas fa-user"></i>Attendance</a></li>
+                <li><a href="checkAttrate.html"><i class="fas fa-user"></i>Student Profile</a></li>
+                <li><a href="absentform.html"><i class="fas fa-list"></i>Absent Request</a></li>
+                <li><a href="index.html"><i class="fas fa-sign-out-alt"></i>Log out</a></li>
+            </ul>
         </div>
-        <div class="buttongenerateQR">
-            <button id="generateQR" onclick="redirectToQRPage()">
-                Generate QR code
-            </button>
-            <button id="buttontoReport" onclick="AttendanceReport()">
-                View Attendance Report
-            </button>
-            <button id="buttontoCheckRate" onclick="checkAttendanceRate()">
-                Check & View Student Attendance Rate
-            </button>
-            <button id="buttontoProfile" onclick="redirectprofile()">
-                Profile
-            </button>
+        
+        <header class="main-header">
+            <div class="profile-container">
+                <img src="img\profile-icon.png" alt="Profile" class="profile-icon" />
+                <div class="profile-dropdown">
+                    <a href="#">Profile</a>
+                    <a href="#">Settings</a>
+                </div>
+            </div>
+            <button id="sidebar-toggle-btn">&#9776;</button>
+        </header>
+        
+        <div class="main-content">
+            <div class="dashboard">
+                
+                <div class="card">
+                    <h1>Welcome to the Instructor Dashboard</h1>
+                    
+                    <p>User Type: <span id="userType"></span></p>
+                    <p>User ID: <span id="userID"></span></p>
+                    <p>User Name: <span id="userName"></span></p>
+
+                    <div class="buttongenerateQR">
+                        <button id="generateQR" onclick="redirectToQRPage()">
+                            Generate QR code
+                        </button>
+                        <button id="buttontoReport" onclick="AttendanceReport()">
+                            View Attendance Report
+                        </button>
+                        <button id="buttontoCheckRate" onclick="checkAttendanceRate()">
+                            Check & View Student Attendance Rate
+                        </button>
+                        <button id="buttontoProfile" onclick="redirectprofile()">
+                            Profile
+                        </button>
+                </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    
+
+    <!-- Footer -->
+    <footer class="footer">
+        <hr>
+        <p>&copy; 2023 ClassTrackr™. All rights reserved.</p>
+    </footer>
+
     <script src="script/instructor.js"></script>
 </body>
 </html>
+
+
