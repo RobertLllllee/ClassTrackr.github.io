@@ -1,22 +1,53 @@
+
 <!DOCTYPE html>
 <html lang="en">
-    <link rel="stylesheet" href="style\checksubjectStyle.css">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check Subjects</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+<link rel="stylesheet" href="style/checksubjectStyle.css" />
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<title>Timetable</title>
 
 </head>
-
 <body>
-    <p>User ID: <span id="userID"></span></p>
+    <header class="main-header">
+  
+        <div class="profile-container">
+          <img src="img/profile-icon.png" alt="Profile" class="profile-icon" />
+          <div class="profile-dropdown">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+          </div>
+        </div>
+<div class="sidebar"> 
+    <div class="logo">
+        <img src="img/logo.png" alt="Logo">
+        <span class="website-name">ClassTrackr</span>
+    </div>
+    <ul class="menu">
+      <li><a href="student.html"> <i class="fas fa-home"></i>Home</a></li>
+        <li><a href="stutimetable.html"><i class="fas fa-columns"></i>Timetable</a></li>
+        <li><a href="absentform.html"><i class="fas fa-file-alt"></i>Absent Form</a></li>
+        <li><a href="calendar.html"><i class="fas fa-calendar-alt"></i>Calendar</a></li>
+        <li><a href="checksubject.html"><i class="fas fa-book"></i>Subjects</a></li>
+        <li><a href="index.html"><i class="fas fa-sign-out-alt"></i>Log Out</a></li>
+       
+</div>
+
+
+    <button id="sidebar-toggle-btn">&#9776;</button>
+  </header>
+<div class="main-content">
+    
+      <p>User ID: <span id="userID"></span></p>
     <p><span id="semester"></span></p>
     
     <div id="subjects-container"></div>
+</div>
+
 
     <script src="script\checksubject.js"></script>
+
 </body>
-
 </html>
-
