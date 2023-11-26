@@ -188,35 +188,52 @@ function clearTable() {
   
 function displayData(data) {
     const table = document.createElement('table');
-    table.border = '1';
+    table.id = 'dataTable';
   
-    // Assuming the data is an array of objects with key-value pairs
-    const headers = Object.keys(data[0]);
-  
-    // Create table header
-    const headerRow = table.insertRow(0);
-    headers.forEach(headerText => {
-      if (headerText !== '_id') { // Exclude _id from headers
-        const headerCell = document.createElement('th');
-        headerCell.appendChild(document.createTextNode(headerText));
-        headerRow.appendChild(headerCell);
+    // Assuming the data is an array of objects
+    if (data.length > 0) {
+      // Create header row
+      const headerRow = table.insertRow();
+      for (const key in data[0]) {
+        const cell = headerRow.insertCell();
+        cell.appendChild(document.createTextNode(key));
       }
-    });
   
-    // Create table rows
-    data.forEach(rowData => {
-      const row = table.insertRow();
-      headers.forEach(header => {
-        if (header !== '_id') { // Exclude _id from rows
+      // Create data rows
+      for (const item of data) {
+        const row = table.insertRow();
+        for (const key in item) {
           const cell = row.insertCell();
-          cell.appendChild(document.createTextNode(rowData[header]));
+  
+          // Check if the current key corresponds to a date field (ending with "DOB")
+          if (key.endsWith('DOB')) {
+            // Format the date and set the cell content
+            cell.appendChild(document.createTextNode(formatDOB(item[key])));
+          } else {
+            // For other fields, directly set the cell content
+            cell.appendChild(document.createTextNode(item[key]));
+          }
         }
-      });
-    });
+      }
+    }
   
     document.body.appendChild(table);
 }
   
+// Function to format date of birth
+function formatDOB(dobArray) {
+    if (!Array.isArray(dobArray) || dobArray.length === 0) {
+      return ''; // Handle empty or invalid data
+    }
+  
+    const dobObject = dobArray[0];
+    const year = dobObject?.Year || '';
+    const month = dobObject?.Month || '';
+    const day = dobObject?.Day || '';
+  
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
+
 function createForm(userType) {
     // Remove existing form, if any
     const existingForm = document.getElementById('createForm');

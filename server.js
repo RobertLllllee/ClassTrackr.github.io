@@ -917,10 +917,23 @@ app.post('/admin/actions', async (req, res) => {
 
         const profiles = await collection.find({}, { projection }).toArray();
 
-        res.json({ success: true, data: profiles });
+        // Format the date of birth before sending the response
+        const formattedProfiles = profiles.map(profile => {
+          const formattedProfile = { ...profile };
+
+          // Check and format date fields
+          if (formattedProfile[`${userType}DOB`] && Array.isArray(formattedProfile[`${userType}DOB`])) {
+            formattedProfile[`${userType}DOB`] = formatDOB(formattedProfile[`${userType}DOB`]);
+          }
+
+          return formattedProfile;
+        });
+
+        res.json({ success: true, data: formattedProfiles });
       } else {
         res.status(400).json({ error: 'Invalid user type' });
       }
+      
     } else if (action === 'validate') {
       // Existing validation logic
       if (userType === 'student' || userType === 'instructor') {
@@ -952,6 +965,20 @@ app.post('/admin/actions', async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
+
+// Function to format date of birth
+function formatDOB(dobArray) {
+  if (!Array.isArray(dobArray) || dobArray.length === 0) {
+    return ''; // Handle empty or invalid data
+  }
+
+  const dobObject = dobArray[0];
+  const year = dobObject?.Year || '';
+  const month = dobObject?.Month || '';
+  const day = dobObject?.Day || '';
+
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
 
 app.listen(5500, () => console.log('Server Started!'));
 
