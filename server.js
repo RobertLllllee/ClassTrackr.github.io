@@ -35,18 +35,16 @@ app.use((req, res, next) => {
   }
 });
 
-const mongoStore = MongoStore.create({
-  client: client,
-  dbName: 'Entities',
-  collectionName: 'sessions',
-});
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
-    store: mongoStore,
+    store: MongoStore.create({
+      client: client,
+      dbName: 'Entities',
+      collectionName: 'sessions',
+    }),
     cookie: {
       secure: true,
       maxAge: 24 * 60 * 60 * 1000,
@@ -891,110 +889,58 @@ app.get('/fetchStudentAttendanceRate', async (req, res) => {
   }
 });
 
-// Endpoint to handle admin actions
 app.post('/admin/actions', async (req, res) => {
   const { action, userType, profile } = req.body;
 
   try {
-    if (action === 'create') {
-      if (userType === 'student' || userType === 'instructor') {
-        const collectionName = userType === 'student' ? 'Student' : 'Instructor';
-        const collection = req.dbClient.db('Entities').collection(collectionName);
+      if (action === 'create') {
+          if (userType === 'student' || userType === 'instructor') {
+              const collectionName = userType === 'student' ? 'Student' : 'Instructor';
+              const collection = req.dbClient.db('Entities').collection(collectionName);
 
-        // Existing create logic
-        await collection.insertOne({ ...profile, _id: undefined });
+              try {
+                  // Perform the insertion without explicit validation
+                  await collection.insertOne({ ...profile, _id: undefined });
+                  res.json({ success: true, message: 'Profile created successfully' });
+              } catch (error) {
+                  console.error('Error:', error);
+                  res.status(500).json({ error: 'Error inserting data' });
+              }
+          } else {
+              res.status(400).json({ error: 'Invalid user type' });
+          }
+      } else if (action === 'display') {
+          if (userType === 'student' || userType === 'instructor') {
+              const collectionName = userType === 'student' ? 'Student' : 'Instructor';
+              const collection = req.dbClient.db('Entities').collection(collectionName);
 
-        // Add additional fields based on user type
-        if (userType === 'student') {
-          // Assuming profile['StudentDOB'] is an array with the expected structure
-          const studentDOB = profile['StudentDOB'] && profile['StudentDOB'][0];
-          
-          // Set default values for additional fields
-          const additionalFields = {
-            TotalClasses: 0,
-            TotalClassAttended: 0,
-            AttendanceRate: 0.0,
-            StudentSession: profile.StudentSession || '',
-            StudentSection: profile.StudentSection || '',
-            StudentCourse: profile.StudentCourse || '',
-            StudentGender: profile.StudentGender || '',
-            StudentPass: profile.StudentPass || '',
-            Year: studentDOB ? studentDOB.Year : '',
-            Month: studentDOB ? studentDOB.Month : '',
-            Day: studentDOB ? studentDOB.Day : '',
-            StudentCurSem: profile.StudentCurSem || '',
-          };
+              // Exclude sensitive fields like StudentPass or InstructorPass from the projection
+              const projection = { _id: 0, StudentPass: 0, InstructorPass: 0 };
 
-          // Update the document with additional fields
-          await collection.updateOne({ _id: profile._id }, { $set: additionalFields });
-        } else if (userType === 'instructor') {
-          // Assuming profile['InstructorDOB'] is an array with the expected structure
-          const instructorDOB = profile['InstructorDOB'] && profile['InstructorDOB'][0];
+              const profiles = await collection.find({}, { projection }).toArray();
 
-          // Set default values for additional fields
-          const additionalFields = {
-            TotalClasses: 0,
-            TotalClassAttended: 0,
-            AttendanceRate: 0.0,
-            InstructorPass: profile.InstructorPass || '',
-            InstructorGender: profile.InstructorGender || '',
-            Year: instructorDOB ? instructorDOB.Year : '',
-            Month: instructorDOB ? instructorDOB.Month : '',
-            Day: instructorDOB ? instructorDOB.Day : '',
-          };
+              res.json({ success: true, data: profiles });
+          } else {
+              res.status(400).json({ error: 'Invalid user type' });
+          }
+      } else if (action === 'validate') {
+          // Validation logic here (check if the provided data already exists)
+          // Return the validation result to the client
+          // Example: Assuming StudentID should be unique
+          const studentCollection = req.dbClient.db('Entities').collection('Student');
+          const existingStudent = await studentCollection.findOne({ StudentID: profile.StudentID });
 
-          // Update the document with additional fields
-          await collection.updateOne({ _id: profile._id }, { $set: additionalFields });
-        }
-
-        res.json({ success: true, message: 'Profile created successfully' });
+          if (existingStudent) {
+              res.json({ valid: false, message: 'Student with the same ID already exists' });
+          } else {
+              res.json({ valid: true, message: 'Validation successful' });
+          }
       } else {
-        res.status(400).json({ error: 'Invalid user type' });
+          res.status(400).json({ error: 'Invalid action' });
       }
-    } else if (action === 'display') {
-      if (userType === 'student' || userType === 'instructor') {
-        const collectionName = userType === 'student' ? 'Student' : 'Instructor';
-        const collection = req.dbClient.db('Entities').collection(collectionName);
-
-        // Exclude sensitive fields like StudentPass or InstructorPass from the projection
-        const projection = { _id: 0, StudentPass: 0, InstructorPass: 0 };
-
-        const profiles = await collection.find({}, { projection }).toArray();
-
-        res.json({ success: true, data: profiles });
-      } else {
-        res.status(400).json({ error: 'Invalid user type' });
-      }
-      
-    } else if (action === 'validate') {
-      // Existing validation logic
-      if (userType === 'student' || userType === 'instructor') {
-        const collectionName = userType === 'student' ? 'Student' : 'Instructor';
-        const collection = req.dbClient.db('Entities').collection(collectionName);
-
-        // Log incoming data
-        console.log('Incoming Data:', profile);
-
-        // Check if the data already exists in the collection
-        const existingData = await collection.findOne({ [`${userType}ID`]: profile[`${userType}ID`] });
-
-        // Log existing data
-        console.log('Existing Data:', existingData);
-
-        if (existingData) {
-          res.json({ valid: false, message: 'Validation failed! The data already exists. Please retype the data.' });
-        } else {
-          res.json({ valid: true, message: 'Validation successful' });
-        }
-      } else {
-        res.status(400).json({ error: 'Invalid user type' });
-      }
-    } else {
-      res.status(400).json({ error: 'Invalid action' });
-    }
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 
