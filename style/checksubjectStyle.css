@@ -39,3 +39,206 @@ body {
   #userName {
     font-weight: bold;
   }
+
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #dee2d6;
+    margin: 0;
+    padding: 0;
+  .sidebar {
+    height: 100%;
+    width: 255px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #3581b8;
+    overflow-x: hidden;
+    padding-top: 20px;
+    box-shadow: 3px 0px 5px rgba(0,0,0,0.2); /* Adjust values as necessary */
+    transition: margin-left 0.3s; /* smooth transition for sidebar */
+  }
+  .sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #ddd;
+    display: block;
+  }
+  .sidebar a:hover {
+    color: #fff;
+    background: #575757;
+  }
+  /* When sidebar is closed, we'll use a class to adjust its margin */
+  .sidebar-closed {
+  margin-left: -250px; /* Adjust to your sidebar's width */
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center; /* Vertically align the logo and website name */
+  }
+  .logo img {
+    width: 100px;
+   margin-right: 10px;
+  }
+  .website-name {
+    color: #ebe9e9; /*text color*/
+    font-size: 22px;
+    font-family: Impact, fantasy;
+  }
+  .menu li {
+    list-style: none;
+    margin-bottom: 10px;
+  }
+  .main-content {
+    margin-left: 240px;
+    padding: 15px;
+    padding-top: 75px; /* Adjust this value to the height of your header plus some space */
+    transition: margin-left 0.3s; /* smooth transition for content */
+  }
+   /* Adjust main content margin when sidebar is closed */
+  .sidebar-closed ~ .main-content {
+  margin-left: 0;
+  }
+  /* New or updated styles for the h1 within .main-content */
+  .main-content h1 {
+  margin-left: 20px; /* Aligns the h1 with the .timetable margin */
+  /* If you need to adjust the right as well, you can use the following:
+  margin: 0 20px 20px; */
+  }
+  .main-content h2 {
+    color: #333;
+  }
+  
+  /* Basic responsiveness */
+  @media screen and (max-width: 600px) {
+    .sidebar {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+    .sidebar a {float: left;}
+    .main-content {margin-left: 0;}
+  }
+  }
+  
+  /* Header styles */
+  .main-header {
+    background-color: #fcb07e; /* Your desired header background color */
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 255px; /* Adjust this value to match the width of your sidebar */
+    right: 0;
+    height: 40px; /* Adjust this value as needed */
+    z-index: 1000; /* Make sure the header is above other content */
+    box-shadow: 0px 3px 5px rgba(0,0,0,0.2); /* Adjust values as necessary */
+    transition: left 0.3s; /* smooth transition for moving the header */
+  }
+  
+  .profile-container {
+      position: relative;
+      float: right;
+      padding: 10px;
+      top: 50%;
+      transform: translateY(-50%); /* Center align vertically */
+    }
+    
+    .profile-icon {
+      width: 40px; /* Adjust size as needed */
+      height: 40px;
+      border-radius: 50%; /* Makes the image round */
+      cursor: pointer;
+      order: 1; /* This ensures the profile icon stays on the right */
+    }
+    
+    .profile-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+    }
+    
+    .profile-dropdown a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      text-align: left;
+    }
+    
+    .profile-dropdown a:hover {background-color: #f1f1f1;}
+    
+    /* Show the dropdown menu on hover */
+    .profile-container:hover .profile-dropdown {
+      display: block;
+    }
+  
+  .sidebar-toggle {
+      position: absolute;
+      top: 10px; /* Adjust if needed */
+      left: 210px; /* Adjust the left positioning to align with the end of the sidebar */
+      z-index: 2;
+  }
+  
+  /* Sidebar toggle button style */
+  #sidebar-toggle-btn {
+      background: #fcb07e; /* Same as sidebar background color */
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 20px;
+      cursor: pointer;
+      display: block; /* Make it a block element to fit the width */
+      min-width: 60px; /* Full width */
+      text-align: left; /* Align the toggler icon to the left */
+      order: -1; /* This will ensure the toggle button stays on the left */
+  }
+  /* Adjust sidebar padding */
+  .sidebar {
+      padding-top: 0; /* Remove padding at the top of the sidebar */
+  }
+  /* Existing sidebar link styles */
+  .sidebar a {
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 18px;
+    color: #ddd;
+    display: block;
+  }
+  
+  /* New style to add spacing to the icons */
+  .sidebar a i {
+    margin-right: 8px; /* Adjust the spacing as needed */
+  }
+  /* Ensure the button isn't visible when the sidebar is not over the content (mobile view) */
+  @media screen and (max-width: 600px) {
+      .sidebar-toggle {
+          display: none;
+      }
+  }
+  
+  /* Footer Styles */
+  .footer {
+      text-align: center;
+      padding: 10px 0;
+      color: #333; /* Change the text color as needed */
+  }
+  
+  .footer p {
+      margin: 0; /* Removes default margin */
+      padding: 4px; /* Adds some padding for spacing */
+  }
+  
+  /* Dividing line for the footer */
+  .footer hr {
+      border: 0; /* Removes default border */
+      height: 1px; /* Sets the height of the line */
+      background-color: #ccc; /* Sets the line color */
+      margin-bottom: 10px; /* Adds some space between the line and the footer text */
+  }
+  
