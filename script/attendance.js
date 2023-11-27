@@ -235,7 +235,7 @@ function fetchUserInfo() {
 // Function to get labeled face descriptions
 async function getLabeledFaceDescriptions() {
   try {
-    const labels = ["Lee Jun Hong" , "YongJun" , "ShiJie"];
+    const labels = ["YongJun" , "ShiJie"];
     return await Promise.all(
       labels.map(async (label) => {
         const descriptions = [];
