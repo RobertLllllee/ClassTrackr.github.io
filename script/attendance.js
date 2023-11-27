@@ -430,11 +430,13 @@ function startFacialRecognition() {
   });
 }
 
+startFacialRecognition();
+
 // Call getLocation with a callback to trigger facial recognition if successful
-getLocation(function (success) {
-  if (success) {
-    // Start facial recognition
-    startFacialRecognition();
-  }
-});
+// getLocation(function (success) {
+//   if (success) {
+//     // Start facial recognition
+//     startFacialRecognition();
+//   }
+// });
 

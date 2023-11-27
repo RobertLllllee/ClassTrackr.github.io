@@ -37,7 +37,7 @@ form {
 label {
     font-weight: bold;
     color: #3581B8;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 select,
@@ -48,7 +48,7 @@ input {
     margin-top: 5px; /* Added margin-top for even spacing */
     border: 1px solid #DEE2D6;
     border-radius: 4px;
-    font-size: 20px;
+    font-size: 15px;
 }
 
 select {
