@@ -11,9 +11,8 @@ body {
 }
 
 .container {
-    width: 450px;
-    margin: 0 auto;
-    padding: 30px;
+    width: 30%;
+    padding: 50px;
     background: rgba(255, 255, 255, 0.25);
     border-radius: 16px;
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -38,7 +37,7 @@ form {
 label {
     font-weight: bold;
     color: #3581B8;
-    font-size: 17px;
+    font-size: 20px;
 }
 
 select,
@@ -49,7 +48,7 @@ input {
     margin-top: 5px; /* Added margin-top for even spacing */
     border: 1px solid #DEE2D6;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 20px;
 }
 
 select {
