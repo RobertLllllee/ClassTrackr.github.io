@@ -1,237 +1,362 @@
-/* body {
-    background-color: #EBE9E9;
-    color: #3581B8;
-    font-family: Arial, sans-serif;
-}
-
-h1, h2 {
-    color: #FCB07E;
-}
-
-label {
-    color: #3581B8;
-    font-weight: bold;
-}
-
-input[type="text"],
-input[type="date"],
-textarea,
-input[type="file"] {
-    background-color: #F3F8F2;
-    border: 1px solid #3581B8;
-    padding: 8px;
-    margin-bottom: 10px;
-}
-
-button {
-    background-color: #FCB07E;
-    color: #EBE9E9;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #DEE2D6;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    margin-bottom: 10px;
-}
-
-#absence-form {
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-#subject-instructor-container {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
-
-#subject-instructor-container input {
-    flex: 1;
-    margin-right: 5px;
-}
-
-#absence-request-details label {
-    margin-top: 10px;
-    display: block;
-}
-
-#instructorName {
-    background-color: #F3F8F2;
-    border: 1px solid #3581B8;
-    padding: 8px;
-    margin-bottom: 10px;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  .sidebar {
-    height: 100%;
-    width: 255px;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    background-color: #3581b8;
-    overflow-x: hidden;
-    padding-top: 20px;
-    box-shadow: 3px 0px 5px rgba(0,0,0,0.2);
-    transition: margin-left 0.3s; 
-  }
-  .sidebar a {
-    padding: 10px 15px;
-    text-decoration: none;
-    font-size: 18px;
-    color: #ddd;
-    display: block;
-  }
-  .sidebar a:hover {
-    color: #fff;
-    background: #575757;
-  }
-
- .sidebar-closed {
-  margin-left: -250px; 
-}
-
-  .logo {
-    display: flex;
-    align-items: center; 
-}
-.logo img {
-    width: 100px;
-   margin-right: 10px;
-}
-.website-name {
-    color: #ebe9e9;
-    font-size: 22px;
-    font-family: Impact, fantasy;
-}
-.menu li {
-    list-style: none;
-    margin-bottom: 10px;
-}
-  .main-content {
-    margin-left: 240px;
-    padding: 15px;
-    padding-top: 75px; 
-    transition: margin-left 0.3s; 
-  }
-
-.sidebar-closed ~ .main-content {
-  margin-left: 0;
-}
-
-.main-content h1 {
-  margin-left: 20px; 
-}
-  .main-content h2 {
-    color: #333;
-  }
-  
-  @media screen and (max-width: 600px) {
-    .sidebar {
-      width: 100%;
-      height: auto;
-      position: relative;
+  /* Header styles */
+  .main-header {
+      background-color: #fcb07e; /* Your desired header background color */
+      padding: 10px 20px;
+      position: fixed;
+      top: 0;
+      left: 255px; /* Adjust this value to match the width of your sidebar */
+      right: 0;
+      height: 40px; /* Adjust this value as needed */
+      z-index: 1000; /* Make sure the header is above other content */
+      box-shadow: 0px 3px 5px rgba(0,0,0,0.2); /* Adjust values as necessary */
+      transition: left 0.3s; /* smooth transition for moving the header */
     }
-    .sidebar a {float: left;}
-    .main-content {margin-left: 0;}
+    
+    .profile-container {
+        position: relative;
+        float: right;
+        padding: 10px;
+        top: 50%;
+        transform: translateY(-50%); /* Center align vertically */
+      }
+      
+      .profile-icon {
+        width: 40px; /* Adjust size as needed */
+        height: 40px;
+        border-radius: 50%; /* Makes the image round */
+        cursor: pointer;
+        order: 1; /* This ensures the profile icon stays on the right */
+      }
+      
+      .profile-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+      }
+      
+      .profile-dropdown a {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+        text-align: left;
+      }
+      
+      .profile-dropdown a:hover {background-color: #f1f1f1;}
+      
+      /* Show the dropdown menu on hover */
+      .profile-container:hover .profile-dropdown {
+        display: block;
+      }
+    
+    .sidebar-toggle {
+        position: absolute;
+        top: 10px; /* Adjust if needed */
+        left: 210px; /* Adjust the left positioning to align with the end of the sidebar */
+        z-index: 2;
+    }
+    
+    /* Sidebar toggle button style */
+    #sidebar-toggle-btn {
+        background: #fcb07e; /* Same as sidebar background color */
+        border: none;
+        color: #fff;
+        padding: 10px 20px;
+        font-size: 20px;
+        cursor: pointer;
+        display: block; /* Make it a block element to fit the width */
+        min-width: 60px; /* Full width */
+        text-align: left; /* Align the toggler icon to the left */
+        order: -1; /* This will ensure the toggle button stays on the left */
+    }
+    /* Adjust sidebar padding */
+    .sidebar {
+        padding-top: 0; /* Remove padding at the top of the sidebar */
+    }
+    /* Existing sidebar link styles */
+    .sidebar a {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #ddd;
+      display: block;
+    }
+    
+    /* New style to add spacing to the icons */
+    .sidebar a i {
+      margin-right: 8px; /* Adjust the spacing as needed */
+    }
+    /* Ensure the button isn't visible when the sidebar is not over the content (mobile view) */
+    @media screen and (max-width: 600px) {
+        .sidebar-toggle {
+            display: none;
+        }
+    }
+
+  /* Apply basic styling to the body and page container */
+  body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+  }
+
+  .container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      text-align: center; /* Center aligns the content */
+      background-color: #fff; /* White background for the card */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Shadow effect */
+      border-radius: 8px; /* Optional: adds rounded corners */
+      padding: 20px;
+      box-sizing: border-box; /* Ensures padding doesn't increase the width */
+  }
+
+  /* Style the header */
+  h1 {
+      font-size: 28px; /* Adjust the font size as needed */
+      text-align: center; /* Center align the header */
+      margin-top: 0; /* Adjust top margin if necessary */
+      margin-bottom: 20px; /* Space below the header */
+      color: #333; /* Optional: header text color */
+      font-weight: normal; /* Adjust font weight if needed */
+  }
+
+  /* Style the form elements */
+  label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+  }
+
+  .input-group {
+      max-width: 400px; /* Adjust this value as needed */
+      margin: auto; /* Center the group */
+      display: flex; /* Align label and input inline */
+      flex-direction: column; /* Stack them vertically */
+      align-items: center; /* Center-align the items */
+  }
+
+  .input-group label,
+  .input-group input {
+      width: 100%; /* Make label and input take the full width of .input-group */
+  }
+
+  /* Adjust the student ID input field specifically if needed */
+  #studentID {
+      max-width: 300px; /* Adjust this value to control the width of the input field */
+  }
+
+  #checkStudentButton {
+      display: block; /* Make it a block-level element */
+      width: fit-content; /* Adjust width to fit its content */
+      margin: 10px auto; /* Center the button */
+      /* Other styling remains the same */
+  }   
+
+  input[type="text"],
+  input[type="date"],
+  textarea {
+      width: calc(100% - 20px); /* Full width minus padding */
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+  }
+  input[type="submit"] {
+      background-color: #4CAF50; /* Green background */
+      color: white;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+  }
+
+  input[type="submit"]:hover {
+      background-color: #45a049; /* Darker green on hover */
+  }
+
+  button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-block; /* Aligns the button according to the text-align of the parent */
+  }
+
+  button:hover {
+      background-color: #0056b3;
+  }
+
+  /* Style the subject-instructor container */
+  #subject-instructor-container {
+      margin-top: 10px;
+  }
+
+  /* Style the absence form buttons and labels */
+  form button[type="button"],
+  form button[type="submit"] {
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+  }
+
+  form button[type="button"]:hover,
+  form button[type="submit"]:hover {
+      background-color: #4caf50;
+  }
+
+  /* Style the student details and absence details containers */
+  #studentDetails, #absence-details {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+  }
+
+  /* Style the list items in the student details container */
+  #studentDetails li {
+      margin: 5px 0;
+  }
+
+  /* Add media queries for responsiveness */
+  @media screen and (max-width: 768px) {
+      .container {
+          padding: 10px;
+      }
+
+      input[type="text"],
+      input[type="date"],
+      textarea {
+          width: calc(100% - 20px); /* Adjust width for smaller screens */
+      }
+  }
+  /* Style for the details table */
+  #studentDetails table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+
+  #studentDetails td {
+      padding: 8px;
+      border: 1px solid #ddd;
+  }
+
+  #studentDetails tr:nth-child(even) {
+      background-color: #f2f2f2;
   }
 
   body {
-    font-family: Arial, sans-serif;
-    background-color: #dee2d6;
-    margin: 0;
-    padding: 0;
-}
+      font-family: Arial, sans-serif;
+      background-color: #dee2d6;
+      margin: 0;
+      padding: 0;
+  }
+    .sidebar {
+      height: 100%;
+      width: 255px;
+      position: fixed;
+      z-index: 1;
+      top: 0;
+      left: 0;
+      background-color: #3581b8;
+      overflow-x: hidden;
+      padding-top: 20px;
+      box-shadow: 3px 0px 5px rgba(0,0,0,0.2); /* Adjust values as necessary */
+      transition: margin-left 0.3s; /* smooth transition for sidebar */
+    }
+    .sidebar a {
+      padding: 10px 15px;
+      text-decoration: none;
+      font-size: 18px;
+      color: #ddd;
+      display: block;
+    }
+    .sidebar a:hover {
+      color: #fff;
+      background: #575757;
+    }
+  /* When sidebar is closed, we'll use a class to adjust its margin */
+  .sidebar-closed {
+    margin-left: -250px; /* Adjust to your sidebar's width */
+  }
 
-*/
+    .logo {
+      display: flex;
+      align-items: center; /* Vertically align the logo and website name */
+  }
+  .logo img {
+      width: 100px;
+    margin-right: 10px;
+  }
+  .website-name {
+      color: #ebe9e9; /*text color*/
+      font-size: 22px;
+      font-family: Impact, fantasy;
+  }
+  .menu li {
+      list-style: none;
+      margin-bottom: 10px;
+  }
+    .main-content {
+      margin-left: 240px;
+      padding: 15px;
+      padding-top: 75px; /* Adjust this value to the height of your header plus some space */
+      transition: margin-left 0.3s; /* smooth transition for content */
+    }
+    /* Adjust main content margin when sidebar is closed */
+  .sidebar-closed ~ .main-content {
+    margin-left: 0;
+  }
+    /* New or updated styles for the h1 within .main-content */
+  .main-content h1 {
+    margin-left: 20px; /* Aligns the h1 with the .timetable margin */
+    /* If you need to adjust the right as well, you can use the following:
+    margin: 0 20px 20px; */
+  }
+    .main-content h2 {
+      color: #333;
+    }
+    
+    /* Basic responsiveness */
+    @media screen and (max-width: 600px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .sidebar a {float: left;}
+      .main-content {margin-left: 0;}
+    }
+  /* Footer Styles */
+  .footer {
+      text-align: center;
+      padding: 10px 0;
+      color: #333; /* Change the text color as needed */
+  }
 
-body {
-  background-color: #EBE9E9;
-  color: #3581B8;
-  font-family: Arial, sans-serif;
-}
+  .footer p {
+      margin: 0; /* Removes default margin */
+      padding: 4px; /* Adds some padding for spacing */
+  }
 
-h1, h2 {
-  color: #FCB07E;
-}
-
-label {
-  color: #3581B8;
-  font-weight: bold;
-}
-
-input[type="text"],
-input[type="date"],
-textarea,
-input[type="file"] {
-  background-color: #F3F8F2;
-  border: 1px solid #3581B8;
-  padding: 8px;
-  margin-bottom: 10px;
-}
-
-button {
-  background-color: #FCB07E;
-  color: #EBE9E9;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #DEE2D6;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  margin-bottom: 10px;
-}
-
-#absence-form {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-#subject-instructor-container {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-#subject-instructor-container input {
-  flex: 1;
-  margin-right: 5px;
-}
-
-#absence-request-details label {
-  margin-top: 10px;
-  display: block;
-}
-
-#instructorName {
-  background-color: #F3F8F2;
-  border: 1px solid #3581B8;
-  padding: 8px;
-  margin-bottom: 10px;
-}
-
-/* Add more styles as needed */
-
+  /* Dividing line for the footer */
+  .footer hr {
+      border: 0; /* Removes default border */
+      height: 1px; /* Sets the height of the line */
+      background-color: #ccc; /* Sets the line color */
+      margin-bottom: 10px; /* Adds some space between the line and the footer text */
+  }
