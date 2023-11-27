@@ -1,48 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<<<<<<< HEAD
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style\AttReportStyle.css">
     <title>Attendance Report</title>
+=======
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+<link rel="stylesheet" href="style/AttReportAdminStyle.css" />
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<title>Attendance Report</title>
+
+>>>>>>> 58792e156845edb4c81dfba453dc52367a3f7656
 </head>
 <body>
-        <h1>Attendance Report</h1>
     
-        <div>
-            <label for="dateFilter">Filter by Date:</label>
-            <select id="dateFilter"></select>
-    
-            <label for="timeslotFilter">Filter by Timeslot:</label>
-            <select id="timeslotFilter"></select>
-    
-            <label for="semesterFilter">Filter by Semester:</label>
-            <select id="semesterFilter"></select>
-    
-            <label for="subjectFilter">Filter by Subject:</label>
-            <select id="subjectFilter"></select>
-    
-            <label for="instructorFilter">Filter by Instructor:</label>
-            <select id="instructorFilter"></select>
-    
-            <br>
-    
-            <label for="studentNameFilter">Filter by Student Name:</label>
-            <input type="text" id="studentNameFilter" placeholder="Type to search">
-    
-            <label for="studentIdFilter">Filter by Student ID:</label>
-            <input type="text" id="studentIdFilter" placeholder="Type to search">
+<div class="sidebar"> 
+    <div class="logo">
+        <img src="img/logo.png" alt="Logo">
+        <span class="website-name">ClassTrackr</span>
+    </div>
+    <ul class="menu">
+        <li><a href="admin.html"> <i class="fas fa-home"></i>Home</a></li>
+        <li><a href="managesubject.html"><i class="fas fa-book"></i>Manage Subject</a></li>
+        <li><a href="AttReport.html"><i class="fas fa-file-word"></i>Manage Report</a></li>
+        <li><a href="checkAttrate.html"><i class="fas fa-percentage"></i>Manage Attendance</a></li>
+        <li><a href="modifyprofile.html"><i class="fas fa-users"></i>Modify Profile</a></li>
+        <li><a href="index.html"><i class="fas fa-sign-out-alt"></i>Log Out</a></li>
+       
+</div>
 
-            <br>
-
-            <button id="filterButton">Apply Filters</button>
-            <button id="clearButton" type="button">Clear All</button>
+<header class="main-header">
+  
+    <div class="profile-container">
+      <img src="img/profile-icon.png" alt="Profile" class="profile-icon" />
+      <div class="profile-dropdown">
+        <a href="#">Profile</a>
+        <a href="#">Settings</a>
+      </div>
+    </div>
+    <button id="sidebar-toggle-btn">&#9776;</button>
+  </header>
+<div class="main-content">
+    <div class="card">
+            <h1>Attendance Report</h1>
+<div>
+    <table class="filter-table">
+        <tr>
+            <td>
+                <label for="dateFilter">Filter by Date:</label>
+                <select id="dateFilter"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="timeslotFilter">Filter by Timeslot:</label>
+                <select id="timeslotFilter"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="semesterFilter">Filter by Semester:</label>
+                <select id="semesterFilter"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="subjectFilter">Filter by Subject:</label>
+                <select id="subjectFilter"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="instructorFilter">Filter by Instructor:</label>
+                <select id="instructorFilter"></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="studentNameFilter">Filter by Student Name:</label>
+                <input type="text" id="studentNameFilter" placeholder="Type to search">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label for="studentIdFilter">Filter by Student ID:</label>
+                <input type="text" id="studentIdFilter" placeholder="Type to search">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button id="filterButton">Apply Filters</button>
+                <button id="clearButton" type="button">Clear All</button>
+            </td>
+        </tr>
+    </table>
         </div>
 
         <br>
-    
-        <div id="attendanceData"></div>
+        <table id="attendanceData">
+            
+            <tbody>
+                <!-- Your data rows will go here -->
+            </tbody>
+        </table>
+</div>
+<!-- Footer -->
+<footer class="footer">
+    <hr> <!-- This will create the dividing line above the footer -->
+    <p>&copy; 2023 ClassTrackr™. All rights reserved.</p>
+</footer>
 
-    <script src="script\AttReport.js"></script>
+   <script src="script\AttReport.js"></script>
+
 </body>
 </html>
